@@ -2,13 +2,12 @@ import os
 import openai
 from dotenv import load_dotenv
 
-from prompt import NL_sys_prompt, code_sys_prompt
+from prompt_plan import NL_sys_prompt, code_sys_prompt
 
-GPT_MODEL = 'gpt-4o-mini'
+GPT_MODEL = 'gpt-4o'
 
-load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
-OPENAI_API_BASE = os.getenv("OPENAI_API_BASE")
+OPENAI_API_KEY = "sk-DRxEVD9NJPfTNZn9852f350063B249Dc9aD49503B1Ad70Ad"
+OPENAI_API_BASE = "http://vip.ooo.cool/v1"
 
 client = openai.OpenAI(api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE)
 
