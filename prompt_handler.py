@@ -8,8 +8,8 @@ from prompt import NL_sys_prompt, code_sys_prompt
 load_dotenv()
 GPT_MODEL = 'gpt-4o'
 
-OPENAI_API_KEY = "sk-BSGfDjcXdNgB1JUF92448fB22442442aAbC07646F4D2CcE7"
-OPENAI_API_BASE = "https://one.ooo.cool/v1"
+OPENAI_API_KEY = ""
+OPENAI_API_BASE = ""
 
 client = openai.OpenAI(api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE)
 
