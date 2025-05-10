@@ -3,14 +3,14 @@ import os
 import json
 from datetime import datetime
 from prompt_handler import NL_planning, code_planning
-
+from induce.induce_actions import induce
 # 配置页面
 st.set_page_config(
     page_title="具身规划Demo",
     page_icon="🧪",
     layout="wide"
 )
-
+new_prompt = ""
 state = st.session_state
 
 # 初始化会话状态
@@ -31,15 +31,6 @@ if "response_code" not in state:
 
 if "prompt" not in state:
     state.prompt = None
-
-if "retry_count" not in state:
-    state.retry_count = 0
-
-if "code_feedback" not in state:
-    state.code_feedback = None
-
-if "needs_code_update" not in state:
-    state.needs_code_update = False
 
 # 侧边栏 - 聊天界面
 with st.sidebar:
@@ -70,15 +61,6 @@ with st.sidebar:
         state.sys_messages.append(user_input)
         state.NL_messages.append(user_input)
         state.code_messages.append(user_input)
-        state.needs_code_update = False  # 重置代码更新标志
-        st.rerun()
-    
-    # 如果需要更新代码
-    if state.needs_code_update:
-        with st.chat_message("assistant"):
-            with st.spinner(text="正在修改代码...", show_time=False):
-                state.response_code = code_planning(state.code_messages)
-        state.needs_code_update = False
         st.rerun()
 
 col1, col2 = st.columns(2, border=True)
@@ -90,70 +72,7 @@ with col1:
             "role": "assistant",
             "content": response
         })
-        # 添加执行结果部分
-        st.subheader("执行结果")
-        try:
-            # 处理代码，移除markdown代码块标记
-            code_to_execute = response
-            code_to_execute = code_to_execute.replace("```python", "").replace("```", "").strip()
-            with open("temp_code.py", "w") as f:
-                f.write(code_to_execute)
-            
-            # 捕获输出
-            import io
-            import sys
-            from contextlib import redirect_stdout
-
-            f = io.StringIO()
-            with redirect_stdout(f):
-                exec(code_to_execute, globals())
-            
-            # 显示执行结果
-            output = f.getvalue()
-            if output:
-                st.code(output, language="text")
-            else:
-                st.info("代码执行完成，没有输出内容")
-            
-            # 执行成功，重置重试计数
-            state.retry_count = 0
-
-            # 添加反馈输入框
-            feedback = st.text_area("执行反馈（如果需要修改代码，请在这里描述问题）：", key="feedback_input")
-            if st.button("提交反馈"):
-                if feedback:
-                    # 将反馈添加到消息历史
-                    feedback_message = {
-                        "role": "user",
-                        "content": f"代码执行反馈：{feedback}\n原代码：\n```python\n{code_to_execute}\n```\n请你根据当前代码和用户反馈生成新的代码，必要时可以修改api工具中的模拟数据"
-                    }
-                    state.code_messages.append(feedback_message)
-                    state.sys_messages.append({"role": "user", "content": feedback})
-                    state.needs_code_update = True
-                    st.rerun()
-                
-        except Exception as e:
-            st.error(f"执行出错: {str(e)}")
-            st.error("处理后的代码内容：")
-            st.code(code_to_execute, language="python")
-            
-            if state.retry_count < 5:
-                state.retry_count += 1
-                # 自动将错误信息作为反馈
-                error_feedback = {
-                    "role": "user",
-                    "content": f"代码执行出现错误（第{state.retry_count}次重试）：{str(e)}\n原代码：\n```python\n{code_to_execute}\n```\n请修复这个错误。"
-                }
-                state.code_messages.append(error_feedback)
-                state.sys_messages.append({"role": "user", "content": f"代码执行出现错误（第{state.retry_count}次重试）：{str(e)}"})
-                
-                # 立即请求新的代码
-                with st.spinner(text=f"正在修复代码（第{state.retry_count}次重试）..."):
-                    state.response_code = code_planning(state.code_messages)
-                st.rerun()
-            else:
-                st.error("已达到最大重试次数（5次），请手动提供反馈或重新开始。")
-                state.retry_count = 0  # 重置重试计数
+        induce(new_prompt, response)
     else:
         st.badge("输入任务以开始", icon=":material/check:", color="green")
 
@@ -169,7 +88,7 @@ with col2:
         st.badge("输入任务以开始", icon=":material/check:", color="green")
 
 # 添加清除聊天按钮
-if st.button("清除聊天历史"):
+if st.button("史清除聊天历"):
     state.sys_messages = []
     state.NL_messages = []
     state.code_messages = []

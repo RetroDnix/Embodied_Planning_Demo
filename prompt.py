@@ -1,3 +1,11 @@
+# from tools import api_tools
+from custiom_action_set import CustomActionSet
+custom_actions = CustomActionSet(retrievable_actions=False)
+api_tools = custom_actions.describe(
+    with_long_description=True,
+    with_examples=True
+)
+
 NL_sys_prompt = """
 你是一个智能机器人的高级规划者，请将复杂的任务分解为简单且易于执行的子任务。
 """
@@ -32,26 +40,14 @@ def solution():
 
 """
 
-code_sys_prompt = f"""
+code_sys_prompt = """
 你是一个智能机器人的高级规划者，你的任务是将复杂的任务分解为简单且易于执行的子任务。
 
 为了让任务的分解更有可执行性，你需要使用Python代码来表示这些子任务。请确保代码是可运行的，并且在每个子任务之间添加注释，以便人类检查你的分解效果。
 
 智能机器人提供以下API：
 
-def check(condition: str)->bool:
-    # 检查环境是否满足某个条件
-    # True：满足 False：不满足
-    return vlm_check(conditon)
-    
-def find(obj: str)->bool:
-    # 在环境中寻找某个物体
-    # True：找到 False：没找到
-    return vlm_find(conditon)
-    
-def execute(command: str)->None:
-    # 使用下层VLA模型执行任意简单动作
-    vla(command)
+{api_tools}
 
 
 以下是一个示例：
@@ -59,3 +55,5 @@ def execute(command: str)->None:
 
 你只需要回答生成的Python代码，不需要解释或提供额外的上下文。
 """
+
+

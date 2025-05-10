@@ -2,8 +2,12 @@ import os
 import openai
 from dotenv import load_dotenv
 
-from prompt_plan import NL_sys_prompt, code_sys_prompt
+from prompt import NL_sys_prompt, code_sys_prompt, code_example
+from custiom_action_set import CustomActionSet
 
+
+
+load_dotenv()
 GPT_MODEL = 'gpt-4o'
 
 OPENAI_API_KEY = "sk-DRxEVD9NJPfTNZn9852f350063B249Dc9aD49503B1Ad70Ad"
@@ -34,8 +38,16 @@ def code_planning(messages):
     通过Code进行提示
     """
     try:
+        custom_actions = CustomActionSet(retrievable_actions=True)
+        api_tools = custom_actions.describe(
+            with_long_description=True,
+            with_examples=True,
+            retrieval_query = messages[-1]["content"],
+            num_retrieve = 3
+        )
+        formatted_sys_prompt = code_sys_prompt.format(api_tools=api_tools, code_example=code_example)
         formatted_messages = [
-            {"role": "system", "content": code_sys_prompt},
+            {"role": "system", "content": formatted_sys_prompt},
             *messages
         ]
 

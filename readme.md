@@ -11,3 +11,4 @@ pip install -r requirements.txt
 ```bash
 streamlit run app.py
 ```
+streamlit run app.py --server.runOnSave false --server.fileWatcherType none
