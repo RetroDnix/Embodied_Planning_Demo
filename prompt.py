@@ -1,6 +1,7 @@
 from tools import api_tools
 NL_sys_prompt = """
-你是一个智能机器人的高级规划者，请将复杂的任务分解为简单且易于执行的子任务。
+你是一个智能机器人的高级规划者，请将复杂的任务分解为简单且易于执行的子任务，每个子任务可以在3-4个底层动作内完成。
+直接返回子任务列表，不需要解释或提供额外的上下文
 """
 
 code_example = """
@@ -31,12 +32,49 @@ def solution():
     # Stage 4： 将蓝色的吸管插入杯子中
     execute("put_straw_into_glass") # 放入吸管
 
+# 任务：下楼找到红色包装外卖并取回
+
+def solution():
+    # Stage 1：选择下楼方式
+    if check("elevator_available"):
+        execute("take_elevator_down")  # 如果电梯可用，则使用电梯
+    else:
+        execute("take_stairs_down")  # 否则使用楼梯
+    
+    # Stage 2：在一楼寻找红色包装的外卖
+    found = False
+    max_attempts = 5  # 限制最多尝试5次
+    attempts = 0
+    
+    while not found and attempts < max_attempts:
+        if find("red_package"):
+            found = True
+        else:
+            execute("search_area_for_red_package")
+        attempts += 1
+    
+    if not found:
+        execute("return_home")  # 如果未找到，返回楼上
+        return  # 退出方案
+
+    # Stage 3：取回外卖
+    execute("pick_up_red_package")
+    
+    # Stage 4：返回楼上
+    if check("elevator_available"):
+        execute("take_elevator_up")  # 如果电梯可用，则使用电梯
+    else:
+        execute("take_stairs_up")  # 否则使用楼梯
+    
+    # Stage 5：将外卖放到桌子上
+    execute("place_package_on_table")
+
 """
 
 code_sys_prompt = f"""
-你是一个智能机器人的高级规划者，你的任务是将复杂的任务分解为简单且易于执行的子任务。
+你是一个智能机器人的高级规划者，你的任务是将复杂的任务分解为简单且易于执行的子任务，每个子任务可以在3-4个底层动作内完成。
 
-为了让任务的分解更有可执行性，你需要使用Python代码来表示这些子任务。请确保代码是可运行的，并且在每个子任务之间添加注释，以便人类检查你的分解效果。
+为了让任务的分解更有可执行性，你需要使用Python代码来表示这些子任务。请确保每个子任务之间添加注释，以便人类检查你的分解效果。
 
 智能机器人提供以下API：
 
@@ -45,6 +83,9 @@ code_sys_prompt = f"""
 
 以下是一个示例：
 {code_example}
+你必须全面而完整地考虑各种情况来解决给定的问题，并对意外情况增加额外的处理。
+
+请充分利用代码的特性来解决问题，例如利用for，while循环、if-else分支、新增函数等。
 
 你只需要回答生成的Python代码，不需要解释或提供额外的上下文。
 """
