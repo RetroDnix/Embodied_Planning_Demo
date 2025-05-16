@@ -3,14 +3,14 @@ import os
 import json
 from datetime import datetime
 from prompt_handler import NL_planning, code_planning
-
+from induce.induce_actions import induce
 # 配置页面
 st.set_page_config(
     page_title="具身规划Demo",
     page_icon="🧪",
     layout="wide"
 )
-
+new_prompt = ""
 state = st.session_state
 
 # 初始化会话状态
@@ -67,11 +67,13 @@ col1, col2 = st.columns(2, border=True)
 with col1:
     st.subheader("代码规划")
     if state.response_code != None:
+        # print(state.response_code)
         response = st.write_stream(state.response_code)
         state.code_messages.append({
             "role": "assistant",
             "content": response
         })
+        induce(new_prompt, response)
     else:
         st.badge("输入任务以开始", icon=":material/check:", color="green")
 

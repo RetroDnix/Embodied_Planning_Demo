@@ -1,4 +1,11 @@
-from tools import api_tools
+# from tools import api_tools
+# from custiom_action_set import CustomActionSet
+# custom_actions = CustomActionSet(retrievable_actions=False)
+# api_tools = custom_actions.describe(
+#     with_long_description=True,
+#     with_examples=True
+# )
+
 NL_sys_prompt = """
 你是一个智能机器人的高级规划者，请将复杂的任务分解为简单且易于执行的子任务，每个子任务可以在3-4个底层动作内完成。
 直接返回子任务列表，不需要解释或提供额外的上下文
@@ -71,8 +78,8 @@ def solution():
 
 """
 
-code_sys_prompt = f"""
-你是一个智能机器人的高级规划者，你的任务是将复杂的任务分解为简单且易于执行的子任务，每个子任务可以在3-4个底层动作内完成。
+code_sys_prompt = """
+你是一个智能机器人的高级规划者，你的任务是将复杂的任务分解为简单且易于执行的子任务。
 
 为了让任务的分解更有可执行性，你需要使用Python代码来表示这些子任务。请确保每个子任务之间添加注释，以便人类检查你的分解效果。
 
@@ -87,7 +94,7 @@ code_sys_prompt = f"""
 
 请充分利用代码的特性来解决问题，例如利用for，while循环、if-else分支、新增函数等。
 
-你只需要回答生成的Python代码，不需要解释或提供额外的上下文。
+你只需要回答生成的Python代码，不需要解释或提供额外的上下文。注意:代码中的注释请使用中文。
 """
 
 
