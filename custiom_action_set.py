@@ -1,10 +1,21 @@
 import inspect
+import openai
 import torch
 from sentence_transformers import SentenceTransformer
 from typing import Optional, List, Dict, Callable
 from dataclasses import dataclass
 from actions import ACTION_DICT  # Import your action dictionary
 from actions import utils
+from dotenv import load_dotenv
+# 加载环境变量
+load_dotenv()
+
+GPT_MODEL = 'text-embedding-ada-002'
+
+OPENAI_API_KEY = "sk-DRxEVD9NJPfTNZn9852f350063B249Dc9aD49503B1Ad70Ad"
+OPENAI_API_BASE = "http://vip.ooo.cool/v1"
+
+client = openai.OpenAI(api_key=OPENAI_API_KEY, base_url=OPENAI_API_BASE)
 
 @dataclass
 class HighLevelAction:
@@ -33,7 +44,8 @@ class CustomActionSet:
         safety_actions: Optional[List[Callable]] = None,
         retrieval_model_name: str = "Alibaba-NLP/gte-Qwen2-1.5B-instruct",
         demo_mode: bool = False,
-        retrievable_actions: bool = False
+        retrievable_actions: bool = False,
+        use_API: bool = False,
     ):
         """
         Initialize with actions from ACTION_DICT or provided ones.
@@ -50,7 +62,6 @@ class CustomActionSet:
         self.retrieval_model_name = retrieval_model_name
         self.python_includes = ""
         self.action_dict = action_dict or ACTION_DICT
-
         # Collect all actions
         self.base_actions = self.action_dict["base"]     # [func for category in self.action_dict.values() for func in category]
         self.base_actions.extend(safety_actions or [])
@@ -59,7 +70,7 @@ class CustomActionSet:
         # Parse actions into high-level actions
         self.action_set: Dict[str, HighLevelAction] = {}
         self.retrievable_action_set: Dict[str, HighLevelAction] = {}
-
+        self.use_API=use_API
         self._parse_actions(self.base_actions, self.action_set)
         self._parse_actions(self.retri_actions, self.retrievable_action_set)
 
@@ -100,21 +111,33 @@ class CustomActionSet:
 
     def _build_retrieval_index(self) -> None:
         """Initialize the action retrieval system."""
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-        self.retrieval_model = SentenceTransformer(self.retrieval_model_name, trust_remote_code=True).to(self.device)
+        if self.use_API:
+            # Prepare action descriptions for retrieval
+            action_descriptions = [
+                self.get_action_doc(action, with_long_description=True, with_examples=True)
+                for action in self.retrievable_action_set.values()
+            ]
+            # Encode actions into embeddings
+            response = client.embeddings.create(input=action_descriptions, model=GPT_MODEL)
+            self.action_embeddings = torch.tensor([record.embedding for record in response.data])
+            self.retri_action_list = list(self.retrievable_action_set.values())
+        else:
+            self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+            self.retrieval_model = SentenceTransformer(self.retrieval_model_name, trust_remote_code=True).to(self.device)
 
-        # Prepare action descriptions for retrieval
-        action_descriptions = [
-            self.get_action_doc(action, with_long_description=True, with_examples=True)
-            for action in self.retrievable_action_set.values()
-        ]
+            # Prepare action descriptions for retrieval
+            action_descriptions = [
+                self.get_action_doc(action, with_long_description=True, with_examples=True)
+                for action in self.retrievable_action_set.values()
+            ]
 
-        # Encode actions into embeddings
-        self.action_embeddings = self.retrieval_model.encode(action_descriptions, convert_to_tensor=True)
-        self.retri_action_list = list(self.retrievable_action_set.values())
+            # Encode actions into embeddings
+            self.action_embeddings = self.retrieval_model.encode(action_descriptions, convert_to_tensor=True)
+            self.retri_action_list = list(self.retrievable_action_set.values())
 
     def retrieve_actions(self, query: str, top_k: int = 3) -> Dict[str, HighLevelAction]:
         """Retrieve the top-K relevant actions based on query."""
+        # client.embeddings.create(input=[text], model=model).data[0].embedding
         query_embedding = self._get_query_embedding(query)
         scores = self._get_similarity_scores(query_embedding)
         top_indices = scores.topk(min(top_k, len(self.retri_action_list))).indices
@@ -126,6 +149,8 @@ class CustomActionSet:
 
     def _get_query_embedding(self, query: str) -> torch.Tensor:
         """Encode the query into an embedding."""
+        if self.use_API:
+            return torch.Tensor(client.embeddings.create(input=[query], model=GPT_MODEL).data[0].embedding)
         return self.retrieval_model.encode(query, convert_to_tensor=True)
 
     def _get_similarity_scores(self, query_embedding: torch.Tensor) -> torch.Tensor:

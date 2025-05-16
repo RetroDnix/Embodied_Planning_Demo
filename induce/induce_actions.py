@@ -66,6 +66,7 @@ def extract_and_write_actions(response: str, write_action_path: str) -> Optional
             if len(a_names) > 0:
                 action_names.extend(a_names)
                 new_actions.append(a)
+    # TODO: 判断语义重复行为，如果行为重复则不写入文件
     print(
         f"Induced #{len(new_actions)}|{len(action_names)} Actions, ",
         [a.split("\n")[0] for a in new_actions],
@@ -88,7 +89,6 @@ def extract_and_write_actions(response: str, write_action_path: str) -> Optional
     except Exception as e:
         print("代码执行出错:", e)
         return None
-    
     with open(write_action_path, 'a+') as fw:
         fw.write('\n\n'+ '\n\n'.join(new_actions))
     return action_names
@@ -97,9 +97,9 @@ def extract_and_write_actions(response: str, write_action_path: str) -> Optional
 
 def induce(query: str, response: str):
     """主流程入口：触发生成、提取并保存动作函数"""
-    sys_msg_path = "induce/prompt/system_message.txt"
-    instruction_path = "induce/prompt/instruction.txt"
-    few_shot_path = "induce/prompt/induce_action.md"
+    sys_msg_path = "induce/prompt/system_message_ch.txt"
+    instruction_path = "induce/prompt/instruction_ch.txt"
+    few_shot_path = "induce/prompt/induce_action_ch.md"
     write_action_path = "actions/store.py"
     query = test_query(query, response)
 

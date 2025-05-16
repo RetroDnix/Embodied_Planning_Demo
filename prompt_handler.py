@@ -38,13 +38,30 @@ def code_planning(messages):
     通过Code进行提示
     """
     try:
-        custom_actions = CustomActionSet(retrievable_actions=True)
+        # 基于API进行检索设置
+        custom_actions = CustomActionSet(retrievable_actions=True,use_API=True)
         api_tools = custom_actions.describe(
             with_long_description=True,
             with_examples=True,
             retrieval_query = messages[-1]["content"],
-            num_retrieve = 3
+            num_retrieve = 5
         )
+        # print(f"api_tools{api_tools}")
+        # 无检索设置
+        # custom_actions = CustomActionSet(retrievable_actions=False)
+        # api_tools = custom_actions.describe(
+        #     with_long_description=True,
+        #     with_examples=True
+        # )
+        # print(f"api_tools{api_tools}")
+        # 使用本地模型进行检索设置
+        # custom_actions = CustomActionSet(retrievable_actions=True,model_name="Alibaba-NLP/gte-Qwen2-1.5B-instruct")
+        # api_tools = custom_actions.describe(
+        #     with_long_description=True,
+        #     with_examples=True,
+        #     retrieval_query = messages[-1]["content"],
+        #     num_retrieve = 7
+        # )
         formatted_sys_prompt = code_sys_prompt.format(api_tools=api_tools, code_example=code_example)
         formatted_messages = [
             {"role": "system", "content": formatted_sys_prompt},

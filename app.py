@@ -67,6 +67,7 @@ col1, col2 = st.columns(2, border=True)
 with col1:
     st.subheader("代码规划")
     if state.response_code != None:
+        # print(state.response_code)
         response = st.write_stream(state.response_code)
         state.code_messages.append({
             "role": "assistant",
@@ -88,7 +89,7 @@ with col2:
         st.badge("输入任务以开始", icon=":material/check:", color="green")
 
 # 添加清除聊天按钮
-if st.button("史清除聊天历"):
+if st.button("清除聊天历史"):
     state.sys_messages = []
     state.NL_messages = []
     state.code_messages = []
