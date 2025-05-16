@@ -1,120 +1,86 @@
 ## Task: None
 ### Original solution:
-```python
-def may_day_travel_plan():
-    # Step 1: 检查当前环境天气是否适合旅行
-    is_weather_good = check("weather_good")
-    if not is_weather_good:
-        raise Exception("不适合旅行，天气条件不佳")
+# 任务：吃饭
 
-    # Step 2: 确定旅行目的地
-    destination = "park"  # 目的地可以根据个人喜好调整
-    execute(f"set_destination {destination}")
+def solution():
+    # Stage 1：检查是否有食物
+    if vlm_check("is there food on the table"):
+        execute("sit_at_table")  # 如果桌上有食物，则坐下
+    else:
+        # 如果没有食物，去买食物
+        buy_items_and_return("food")
+        execute("sit_at_table")  # 返回后坐下
+    
+    # Stage 2：检查是否有餐具
+    if find("cutlery"):
+        execute("pick_up_cutlery")  # 如果找到餐具，则拿起餐具
+    else:
+        execute("search_area_for_cutlery")  # 否则寻找餐具
+        if find("cutlery"):
+            execute("pick_up_cutlery")  # 找到餐具后，拿起餐具
+        else:
+            execute("use_hands_to_eat")  # 如果仍未找到餐具，则使用手吃
+    
+    # Stage 3：吃饭
+    execute("start_eating")
+    
+    # Stage 4：检查是否吃完
+    while not vlm_check("is the plate empty"):
+        execute("continue_eating")  # 如果盘子未空，则继续吃
+    
+    # Stage 5：结束用餐
+    execute("put_down_cutlery")  # 放下餐具
+    execute("leave_table")  # 离开桌子
 
-    # Step 3: 确定交通方式
-    transportation = choose_transportation(mode="public_transport_or_car")
-
-    # Step 4: 检查是否已经准备好旅行必需品
-    if not check("essentials_ready"):
-        # Stage 4.1: 准备必需品
-        pack_essentials()
-
-    # Step 5: 出发进行旅行
-    execute("depart_for_travel")
-
-def choose_transportation(mode):
-    if mode == "public_transport":
-        execute("check_public_transport_schedule")
-    elif mode == "car":
-        execute("check_fuel_level")
-        if not check("fuel_sufficient"):
-            execute("refuel_car")
-    return mode
-
-def pack_essentials():
-    essential_items = ["water", "snacks", "map", "sunscreen"] 
-    for item in essential_items:
-        execute(f"pack {item}")
-
-may_day_travel_plan()
-```
+solution()
 
 
 
 ```python
-def verify_and_prepare_travel(destination: str, transportation_mode: str):
-    """检查天气状况，设定目的地，并准备旅行必需品
-
+def prepare_to_eat():
+    """准备吃饭并从桌子上完成用餐。
+    
+    检查食物是否在桌上，寻找餐具，吃饭并在结束后离桌
+    
     Args:
-        destination (str): 旅行目的地
-        transportation_mode (str): 选择的交通方式
-
+        无
+    
     Returns:
-        str: 确认消息
-
+        无
+    
     Examples:
-        verify_and_prepare_travel("park", "public_transport")
+        prepare_to_eat()
     """
-    # Step 1: 检查天气状况
-    if not check("weather_good"):
-        raise Exception("不适合旅行，天气条件不佳")
+    # 检查是否有食物，并在返回后或确认桌上有食物时就座
+    if vlm_check("is there food on the table"):
+        execute("sit_at_table")
+    else:
+        buy_items_and_return("food")
+        execute("sit_at_table")
     
-    # Step 2: 设定旅行目的地
-    execute(f"set_destination {destination}")
+    # 寻找并拿起餐具，否则使用手
+    if find("cutlery"):
+        execute("pick_up_cutlery")
+    else:
+        execute("search_area_for_cutlery")
+        if find("cutlery"):
+            execute("pick_up_cutlery")
+        else:
+            execute("use_hands_to_eat")
     
-    # Step 3: 检查交通方式
-    transportation = choose_transportation(transportation_mode)
+    # 开始吃饭，直到盘子空了才停止
+    execute("start_eating")
+    while not vlm_check("is the plate empty"):
+        execute("continue_eating")
     
-    # Step 4: 检查和准备旅行必需品
-    if not check("essentials_ready"):
-        pack_essentials()
-    
-    return "Travel is prepared and ready to depart."
-
-def prepare_transportation(transportation_mode: str):
-    """为选择的交通方式做好准备
-
-    Args:
-        transportation_mode (str): 交通方式 ("public_transport" or "car")
-
-    Returns:
-        str: 交通方式确认
-
-    Examples:
-        prepare_transportation("car")
-    """
-    if transportation_mode == "public_transport":
-        execute("check_public_transport_schedule")
-    elif transportation_mode == "car":
-        execute("check_fuel_level")
-        if not check("fuel_sufficient"):
-            execute("refuel_car")
-    return transportation_mode
-
-def ensure_essentials_ready(items: list):
-    """确保旅行必需品已准备好
-
-    Args:
-        items (list): 必需品列表
-
-    Returns:
-        None
-
-    Examples:
-        ensure_essentials_ready(["water", "snacks", "map", "sunscreen"])
-    """
-    for item in items:
-        execute(f"pack {item}")
-    execute("check_essentials_status")
+    # 结束用餐并离桌
+    execute("put_down_cutlery")
+    execute("leave_table")
 ```
-
 
 ## Rewritten Trajectories
 ```python
-def may_day_travel_plan():
-    # Step 1: 检查并准备旅行计划
-    message = verify_and_prepare_travel("park", "public_transport_or_car")
-    
-    # Step 2: 出发进行旅行
-    execute("depart_for_travel")
+def solution():
+    # 任务：准备吃饭并完成用餐
+    prepare_to_eat()
 ```

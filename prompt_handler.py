@@ -64,6 +64,7 @@ def code_planning(messages):
         #     num_retrieve = 7
         # )
         formatted_sys_prompt = code_sys_prompt.format(api_tools=api_tools, code_example=code_example)
+        # print(formatted_sys_prompt)
         formatted_messages = [
             {"role": "system", "content": formatted_sys_prompt},
             *messages
