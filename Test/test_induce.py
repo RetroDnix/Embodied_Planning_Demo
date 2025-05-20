@@ -1,3 +1,5 @@
+import sys
+sys.path.append('D:/25/em/Embodied_Planning_Demo-sqzhou/Embodied_Planning_Demo')
 from induce.induce_actions import induce
 query = "帮我收拾一下用餐后的桌面"
 response = """

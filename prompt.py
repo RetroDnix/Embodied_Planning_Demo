@@ -1,11 +1,3 @@
-# from tools import api_tools
-# from custiom_action_set import CustomActionSet
-# custom_actions = CustomActionSet(retrievable_actions=False)
-# api_tools = custom_actions.describe(
-#     with_long_description=True,
-#     with_examples=True
-# )
-
 NL_sys_prompt = """
 你是一个智能机器人的高级规划者，请将复杂的任务分解为简单且易于执行的子任务。
 """

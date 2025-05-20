@@ -5,7 +5,7 @@ from sentence_transformers import SentenceTransformer
 from typing import Optional, List, Dict, Callable
 from dataclasses import dataclass
 from actions import ACTION_DICT  # Import your action dictionary
-from actions import utils
+from base import utils, vla, vlm
 from dotenv import load_dotenv
 # 加载环境变量
 load_dotenv()
@@ -29,13 +29,13 @@ class CustomActionSet:
     """
     Custom action set for robot control that integrates with existing ACTION_DICT
     """
-    # _instance = None
+    _instance = None
 
-    # def __new__(cls, *args, **kwargs):
-    #     if not cls._instance:
-    #         cls._instance = super(CustomActionSet, cls).__new__(cls)
-    #         cls._instance._initialized = False
-    #     return cls._instance
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super(CustomActionSet, cls).__new__(cls)
+            cls._instance._initialized = False
+        return cls._instance
     
 
     def __init__(
@@ -56,32 +56,38 @@ class CustomActionSet:
             retrieval_model_name: Name of the retrieval model
             demo_mode: Whether to run in demo mode
         """
-        # if self._initialized:
-        #     return
+        if self._initialized:
+            print(f"use_API : {'True' if self.use_API else 'False'}")  # 正确的 Python 三元表达式
+            return
+        self._initialized = True
         self.demo_mode = demo_mode
         self.retrieval_model_name = retrieval_model_name
         self.python_includes = ""
+        self.functions_includes = []
         self.action_dict = action_dict or ACTION_DICT
         # Collect all actions
-        self.base_actions = self.action_dict["base"]     # [func for category in self.action_dict.values() for func in category]
+        self.base_actions = self.action_dict["base"]    
         self.base_actions.extend(safety_actions or [])
-        self.retri_actions = self.action_dict["store"] 
+        self.retri_actions = [x for x in self.action_dict["store"]  if x not in self.action_dict["base"] ] 
 
         # Parse actions into high-level actions
         self.action_set: Dict[str, HighLevelAction] = {}
         self.retrievable_action_set: Dict[str, HighLevelAction] = {}
         self.use_API=use_API
-        self._parse_actions(self.base_actions, self.action_set)
-        self._parse_actions(self.retri_actions, self.retrievable_action_set)
-
 
         self.python_includes += "import time\n"
-        for _, func in inspect.getmembers(utils, inspect.isfunction):
-            self.python_includes += f"""\
+        for module in [utils, vla, vlm]:
+            for _, func in inspect.getmembers(module, inspect.isfunction):
+                self.functions_includes.append(func.__name__)
+                self.python_includes += f"""\
 {inspect.getsource(func)}
 
 
 """
+
+        self._parse_actions(self.base_actions, self.action_set)
+        self._parse_actions(self.retri_actions, self.retrievable_action_set)
+
         # Build retrieval index if needed
         if retrievable_actions:
             self._build_retrieval_index()
@@ -93,7 +99,9 @@ class CustomActionSet:
                 continue
 
             source = inspect.getsource(func)
-            self.python_includes += f"{source}\n\n"
+            if func.__name__ not in self.functions_includes:
+                self.functions_includes.append(func.__name__)
+                self.python_includes += f"{source}\n\n"
 
             signature = f"{func.__name__}{inspect.signature(func)}"
             docstring = inspect.getdoc(func) or ""
@@ -157,6 +165,63 @@ class CustomActionSet:
         """Calculate the similarity between query and action embeddings."""
         return torch.matmul(query_embedding, self.action_embeddings.T).squeeze()
 
+    def add_functions_from_strings(
+        self,
+        func_str_list: List[str],
+        action_name_list: List[str],
+        rebuild_index: bool = True,
+        write_action_path: str = "actions/store.py"
+    ) -> None:
+        # 写入函数到文件
+        try:
+            with open(write_action_path, 'a+', encoding='utf-8') as fw:
+                fw.write('\n\n' + '\n\n'.join(func_str_list))
+        except IOError as e:
+            print(f"写入文件失败: {str(e)}")
+            return
+        
+        # 强制重新加载模块
+        try:
+            import importlib
+            import sys
+            if 'actions.store' in sys.modules:
+                importlib.reload(sys.modules['actions.store'])
+            store = importlib.import_module('actions.store')
+        except ImportError as e:
+            print(f"导入store模块失败: {str(e)}")
+            return
+        
+        functions = []
+        for name in action_name_list:
+            try:
+                f = getattr(store, name)
+                if callable(f):
+                    # 添加模块前缀检查（可选）
+                    module = getattr(f, '__module__', '')
+                    if module.startswith('actions.'):
+                        functions.append(f)
+                        print(f"成功获取函数: {name}")
+                    else:
+                        print(f"函数'{name}'模块前缀不匹配: {module}")
+            except Exception as e:
+                print(f"获取函数'{name}'失败: {str(e)}")
+        
+        if not functions:
+            print("警告: 没有有效的函数被获取")
+            return
+        
+        # 更新数据结构
+        self.action_dict.setdefault("store", []).extend(functions)
+        self.retri_actions.extend(functions)
+        self._parse_actions(functions, self.retrievable_action_set)
+        
+        if rebuild_index and hasattr(self, 'action_embeddings'):
+            try:
+                self._build_retrieval_index()
+            except Exception as e:
+                print(f"重建检索索引失败: {str(e)}")
+    
+                
     @staticmethod
     def get_action_doc(
         action: HighLevelAction, with_long_description: bool = True, with_examples: bool = True
@@ -191,15 +256,70 @@ class CustomActionSet:
 
         return description
 
-    def to_python_code(self, solution: str):
+    def to_python_code(self, solution: str, traj_name: str):
         python_code = ""
         python_code += self.python_includes
         main = f"""\
         
 def main():
-    solution()
+    {traj_name}()
 
 if __name__ == "__main__":
     main()
 """
         return python_code + solution + main
+    
+    def get_function_bodies_from_code(self, function_str: str) -> List[str]:
+        import ast
+        import re
+        
+        # 新增：提取代码块内容（```或```python ```包裹的部分）
+        def extract_code_blocks(text):
+            pattern = r'```(?:python)?\s*\n?(.*?)\n?```'
+            matches = re.findall(pattern, text, re.DOTALL)
+            return matches if matches else [text]  # 如果没有代码块，返回原始文本
+        
+        try:
+            # 先提取所有代码块
+            code_blocks = extract_code_blocks(function_str)
+            all_function_bodies = []
+            
+            for block in code_blocks:
+                # Parse the function string into an AST
+                tree = ast.parse(block)
+                
+                # Extract all function calls
+                all_function_calls = set()
+                for node in ast.walk(tree):
+                    if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+                        all_function_calls.add(node.func.id)
+                
+                # Filter out Python built-ins and standard library functions
+                python_builtins = dir(__builtins__)
+                custom_function_calls = [func for func in all_function_calls 
+                                        if func not in python_builtins]
+                
+                # Get function bodies for the custom functions
+                function_bodies = []
+                
+                for func_name in custom_function_calls:
+                    # Check in the main action set
+                    if func_name in self.retrievable_action_set:
+                        function_bodies.append(self.retrievable_action_set[func_name].function)
+                
+                all_function_bodies.extend(function_bodies)
+
+            # 打印调试信息
+            for func in all_function_bodies:
+                print("="*50)
+                print(func)
+                print("="*50)
+                
+            return all_function_bodies
+            
+        except SyntaxError as e:
+            print(f"Syntax error in function string: {e}")
+            return []
+        except Exception as e:
+            print(f"Error extracting function calls: {e}")
+            return []

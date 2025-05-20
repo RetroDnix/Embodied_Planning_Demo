@@ -1,4 +1,6 @@
 # 示例：调用 code_planning 函数
+import sys
+sys.path.append('D:/25/em/Embodied_Planning_Demo-sqzhou/Embodied_Planning_Demo')
 from prompt_handler import code_planning
 # 假设这是你要传入的对话消息列表
 messages = [

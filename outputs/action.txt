@@ -1,120 +1,63 @@
-## Task: None
+## Task: °ïÎÒÈ¥Ò»ÏÂ¿ìµİ
 ### Original solution:
 ```python
-def may_day_travel_plan():
-    # Step 1: æ£€æŸ¥å½“å‰ç¯å¢ƒå¤©æ°”æ˜¯å¦é€‚åˆæ—…è¡Œ
-    is_weather_good = check("weather_good")
-    if not is_weather_good:
-        raise Exception("ä¸é€‚åˆæ—…è¡Œï¼Œå¤©æ°”æ¡ä»¶ä¸ä½³")
+def solution():
+    # Stage 1£º È·±£ÎÒÃÇµ±Ç°ÔÚÕıÈ·µÄÂ¥²ã£¬¼´Ô­Ê¼Â¥²ã
+    if not check("at_original_floor"):
+        # Èç¹ûµ±Ç°²»ÔÚÔ­Ê¼Â¥²ã£¬ÏòÔ­Ê¼Â¥²ãµ¼º½
+        execute("navigate_to_original_floor")
 
-    # Step 2: ç¡®å®šæ—…è¡Œç›®çš„åœ°
-    destination = "park"  # ç›®çš„åœ°å¯ä»¥æ ¹æ®ä¸ªäººå–œå¥½è°ƒæ•´
-    execute(f"set_destination {destination}")
+    # Stage 2£º µ¼º½µ½¿ìµİ¹ñËùÔÚµÄÂ¥²ã
+    execute("navigate_to_target_floor")
+    
+    # Stage 3£º ÔÚ¿ìµİ¹ñÖĞµ¼º½²¢¼ìË÷°ü¹ü
+    navigate_and_retrieve_package()
 
-    # Step 3: ç¡®å®šäº¤é€šæ–¹å¼
-    transportation = choose_transportation(mode="public_transport_or_car")
+    # Stage 4£º È·±£°ü¹üÒÑ¾­³É¹¦È¡³ö
+    if not check("package_retrieved"):
+        raise Exception("Ã»ÓĞÕÒµ½¿ìµİ¹ñ»òÕß¿ìµİ²»ÔÚ¿ìµİ¹ñÖĞ")
 
-    # Step 4: æ£€æŸ¥æ˜¯å¦å·²ç»å‡†å¤‡å¥½æ—…è¡Œå¿…éœ€å“
-    if not check("essentials_ready"):
-        # Stage 4.1: å‡†å¤‡å¿…éœ€å“
-        pack_essentials()
+    # Stage 5£º ·µ»Øµ½Ô­À´µÄÂ¥²ã
+    execute("navigate_to_original_floor")
+    
+    # Stage 6£º È·±£ÒÑ»Øµ½Ô­Ê¼Â¥²ã
+    if not check("at_original_floor"):
+        raise Exception("Ã»ÓĞ³É¹¦·µ»ØÔ­Ê¼Â¥²ã")
 
-    # Step 5: å‡ºå‘è¿›è¡Œæ—…è¡Œ
-    execute("depart_for_travel")
-
-def choose_transportation(mode):
-    if mode == "public_transport":
-        execute("check_public_transport_schedule")
-    elif mode == "car":
-        execute("check_fuel_level")
-        if not check("fuel_sufficient"):
-            execute("refuel_car")
-    return mode
-
-def pack_essentials():
-    essential_items = ["water", "snacks", "map", "sunscreen"] 
-    for item in essential_items:
-        execute(f"pack {item}")
-
-may_day_travel_plan()
+solution()
 ```
 
 
 
 ```python
-def verify_and_prepare_travel(destination: str, transportation_mode: str):
-    """æ£€æŸ¥å¤©æ°”çŠ¶å†µï¼Œè®¾å®šç›®çš„åœ°ï¼Œå¹¶å‡†å¤‡æ—…è¡Œå¿…éœ€å“
-
-    Args:
-        destination (str): æ—…è¡Œç›®çš„åœ°
-        transportation_mode (str): é€‰æ‹©çš„äº¤é€šæ–¹å¼
-
-    Returns:
-        str: ç¡®è®¤æ¶ˆæ¯
+def navigate_and_handle_package(target_floor: str):
+    """µ¼º½µ½Ä¿±êÂ¥²ã²¢´¦Àí°ü¹üµÄ»ñÈ¡ºÍ·µ»Ø
 
     Examples:
-        verify_and_prepare_travel("park", "public_transport")
+        navigate_and_handle_package("package_floor")
     """
-    # Step 1: æ£€æŸ¥å¤©æ°”çŠ¶å†µ
-    if not check("weather_good"):
-        raise Exception("ä¸é€‚åˆæ—…è¡Œï¼Œå¤©æ°”æ¡ä»¶ä¸ä½³")
+    # È·±£ÎÒÃÇµ±Ç°ÔÚÄ¿±êÂ¥²ã
+    if not check(f"at_{target_floor}"):
+        execute(f"navigate_to_{target_floor}")
     
-    # Step 2: è®¾å®šæ—…è¡Œç›®çš„åœ°
-    execute(f"set_destination {destination}")
+    # ÔÚ¿ìµİ¹ñÖĞµ¼º½²¢¼ìË÷°ü¹ü
+    execute("navigate_and_retrieve_package")
     
-    # Step 3: æ£€æŸ¥äº¤é€šæ–¹å¼
-    transportation = choose_transportation(transportation_mode)
+    # È·±£°ü¹üÒÑ¾­³É¹¦È¡³ö
+    if not check("package_retrieved"):
+        print("Ã»ÓĞÕÒµ½¿ìµİ¹ñ»òÕß¿ìµİ²»ÔÚ¿ìµİ¹ñÖĞ¡£")  # ¼ÇÂ¼Ê§°ÜÈÕÖ¾
     
-    # Step 4: æ£€æŸ¥å’Œå‡†å¤‡æ—…è¡Œå¿…éœ€å“
-    if not check("essentials_ready"):
-        pack_essentials()
+    # ·µ»Øµ½Ô­À´µÄÂ¥²ã
+    execute("navigate_to_original_floor")
     
-    return "Travel is prepared and ready to depart."
-
-def prepare_transportation(transportation_mode: str):
-    """ä¸ºé€‰æ‹©çš„äº¤é€šæ–¹å¼åšå¥½å‡†å¤‡
-
-    Args:
-        transportation_mode (str): äº¤é€šæ–¹å¼ ("public_transport" or "car")
-
-    Returns:
-        str: äº¤é€šæ–¹å¼ç¡®è®¤
-
-    Examples:
-        prepare_transportation("car")
-    """
-    if transportation_mode == "public_transport":
-        execute("check_public_transport_schedule")
-    elif transportation_mode == "car":
-        execute("check_fuel_level")
-        if not check("fuel_sufficient"):
-            execute("refuel_car")
-    return transportation_mode
-
-def ensure_essentials_ready(items: list):
-    """ç¡®ä¿æ—…è¡Œå¿…éœ€å“å·²å‡†å¤‡å¥½
-
-    Args:
-        items (list): å¿…éœ€å“åˆ—è¡¨
-
-    Returns:
-        None
-
-    Examples:
-        ensure_essentials_ready(["water", "snacks", "map", "sunscreen"])
-    """
-    for item in items:
-        execute(f"pack {item}")
-    execute("check_essentials_status")
+    # È·±£ÒÑ»Øµ½Ô­Ê¼Â¥²ã
+    if not check("at_original_floor"):
+        print("Ã»ÓĞ³É¹¦·µ»ØÔ­Ê¼Â¥²ã¡£")  # ¼ÇÂ¼Ê§°ÜÈÕÖ¾
 ```
-
 
 ## Rewritten Trajectories
 ```python
-def may_day_travel_plan():
-    # Step 1: æ£€æŸ¥å¹¶å‡†å¤‡æ—…è¡Œè®¡åˆ’
-    message = verify_and_prepare_travel("park", "public_transport_or_car")
-    
-    # Step 2: å‡ºå‘è¿›è¡Œæ—…è¡Œ
-    execute("depart_for_travel")
+def solution():
+    # Stage 1: µ¼º½µ½¿ìµİ¹ñËùÔÚµÄÂ¥²ã²¢´¦Àí°ü¹ü
+    navigate_and_handle_package("target_floor")
 ```
