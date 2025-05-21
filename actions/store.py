@@ -341,233 +341,176 @@ def wash_and_dry_clothes():
     # 洗完后进行衣物晾干
     execute("remove_and_dry_clothes")
 
-def make_coffee_process(coffee_type: str):
-    """进行咖啡的制作和自定义工作流程
 
-    Args:
-        coffee_type (str): 需要准备的咖啡种类
 
-    Returns:
-        str: 制作完成后的通知信息
+def play_show_on_website(website_url: str, show_name: str, season: int, episode: int):
+    """打开指定网站，搜索并播放特定节目的一集
 
     Examples:
-        make_coffee_process("americano")
+        play_show_on_website("https://www.iqiyi.com", "奔跑吧兄弟", 1, 2)
     """
-    # 检查并准备热咖啡
-    if not prepare_coffee(coffee_type):
-        raise Exception(f"Failed to prepare hot {coffee_type}")
-
-    # 检查并准备冰咖啡
-    if not prepare_iced_coffee(coffee_type):
-        raise Exception(f"Failed to prepare iced {coffee_type}")
-
-    # 根据用户的偏好自定义咖啡
-    customize_coffee()
+    # 打开浏览器
+    execute("open_browser")
     
-    return f"Iced {coffee_type.capitalize()} is ready!"
+    # 导航到指定网站
+    execute(f"navigate_to_url {website_url}")
+    
+    # 搜索指定节目
+    execute(f"search_for_show {show_name}")
+    
+    # 定位到特定的季和集
+    execute(f"locate_season {season}")
+    execute(f"locate_episode {episode}")
+    
+    # 播放该集
+    execute("play_video")
 
 def prepare_coffee_drink(drink_type: str):
-    """准备特定类型的咖啡饮品并根据情况进行定制
-
-    Args:
-        drink_type (str): 需要准备的饮品类型
+    """准备指定类型的咖啡饮品，如果咖啡机未准备好则进行准备
 
     Examples:
         prepare_coffee_drink("cappuccino")
     """
-    # 检查是否有咖啡豆
-    if not find("coffee_beans"):
-        execute("get_coffee_beans")
+    # 验证咖啡机是否准备好了
+    if not check("coffee_machine_ready"):
+        execute("prepare_coffee_machine")
     
-    # 制作咖啡饮品
-    execute(f"make_{drink_type}")
+    # 制作饮品
+    execute(f"brew_{drink_type}")
     
-    # 根据情况进行定制
-    execute(f"customize_{drink_type}")
-    
-    # 检查咖啡饮品是否准备好
-    if check(f"{drink_type}_ready"):
-        execute(f"serve_{drink_type}")
-    else:
-        print(f"无法制作 {drink_type}。")  # 记录失败日志
+    # 根据用户的偏好进行调整
+    customize_coffee()
 
-def prepare_and_wash_clothes():
-    """准备、分类并进行洗涤流程
-
-    Args:
-        None
-
-    Returns:
-        None
+def clear_sink():
+    """清理洗菜池及其周边
 
     Examples:
-        prepare_and_wash_clothes()
+        clear_sink()
     """
-    # 准备要洗的衣物（分类）
-    execute("prepare_clothes_for_wash")
+    # 移除洗菜池中的所有餐具或杂物
+    while find("dish_in_sink"):
+        execute("remove_dish_from_sink")
 
-    # 整理衣物并放入洗衣机
-    execute("prepare_and_load_clothes")
-
-    # 启动洗涤流程
-    execute("wash_clothes")
-
-    # 取出并晾干衣物
-    execute("remove_and_dry_clothes")
-
-def prepare_and_customize_coffee(drink_type: str, preferences: list):
-    """准备咖啡并根据用户偏好定制
-
-    Args:
-        drink_type (str): 要准备的咖啡类型
-        preferences (list): 用户偏好设置列表
-
-    Returns:
-        str: 操作完成的消息
-
-    Examples:
-        prepare_and_customize_coffee("cappuccino", ["extra_hot", "no_sugar"])
-    """
-    # 第一步：准备指定类型的咖啡饮品
-    execute(f"prepare_{drink_type}_drink")
-
-    # 第二步：根据偏好定制咖啡
-    for preference in preferences:
-        execute(f"customize_coffee_{preference}")
-
-    return "咖啡已准备并根据用户偏好定制。"
-
-def setup_and_prepare_coffee(coffee_type: str):
-    """配置必要设备并开始准备特定类型的咖啡饮品
-
-    Args:
-        coffee_type (str): 要准备的咖啡饮品类型
+    # 移除洗菜池中的食物残渣
+    while find("food_debris_in_sink"):
+        execute("remove_food_debris_from_sink")
     
+    # 清洁洗菜池表面
+    if not check("sink_surface_clean"):
+        execute("clean_sink_surface")
+    
+    # 确保排水口通畅
+    if not check("drain_clear"):
+        execute("clear_drain")
+
+    # 清理洗菜池周边区域
+    if find("water_splotch_near_sink") or find("debris_near_sink"):
+        execute("clean_area_around_sink")
+
+def prepare_to_wash(item: str):
+    """准备清洗，清理水槽中的杂物并确保有水
+
     Examples:
-        setup_and_prepare_coffee("cappuccino")
+        prepare_to_wash("fruit")
     """
-    # 确保咖啡机是可用的
-    if not check("coffee_machine_available"):
-        execute("setup_coffee_machine")
+    # 确保水槽没有杂物
+    if find("debris_in_sink"):
+        execute("clear_sink")
+    
+    # 确保有足够的水
+    if not check("enough_water"):
+        execute("open_water_tap")
+    
+    # 如果物品未在水下，则将其放入
+    if not check(f"{item}_under_water"):
+        execute(f"put_{item}_under_water")
 
-    # 开始准备指定类型的咖啡
-    execute(f"prepare_{coffee_type}")
+def wash_thoroughly(item: str):
+    """彻底清洗物品并关闭水源
 
-def customize_coffee(coffee_type: str):
-    """根据用户需求定制特定类型的咖啡饮品
+    Examples:
+        wash_thoroughly("fruit")
+    """
+    # 完全清洗物品
+    execute(f"wash_{item}_thoroughly")
+    
+    # 检查水龙头是否打开，如果是则关闭
+    if check("water_tap_open"):
+        execute("close_water_tap")
 
-    Args:
-        coffee_type (str): 要定制的咖啡饮品类型
+def wash_fruit():
+    # Stage 1: 准备清洗水果
+    prepare_to_wash("fruit")
+    
+    # Stage 2: 完全清洗水果并关闭水源
+    wash_thoroughly("fruit")
+
+wash_fruit()
+
+def open_and_search_in_app(app: str, search_item: str) -> bool:
+    """打开给定的应用并搜索指定的项目
+
+    Examples:
+        open_and_search_in_app("meituan", "霸王茶姬")
+    """
+    # 打开应用
+    execute(f"open_{app}_app")
+    
+    # 搜索项目
+    execute(f"search '{search_item}'")
+    
+    # 确认搜索结果中是否存在该项目
+    return find(f"{search_item}_shop")
+
+def select_and_add_item_to_cart(item: str, with_customization: bool = False) -> bool:
+    """选择商品并将其添加到购物车中，必要时进行自定义
+
+    Examples:
+        select_and_add_item_to_cart("霸王茶姬_milk_tea", with_customization=True)
+    """
+    # 浏览菜单并选择商品
+    if find(item):
+        execute(f"select_product '{item}'")
         
-    Examples:
-        customize_coffee("cappuccino")
-    """
-    # 开始为该咖啡饮品定制
-    execute(f"customize_{coffee_type}")
-
-def place_coffee(coffee_type: str):
-    """将准备好的咖啡饮品放到合适的位置
-
-    Args:
-        coffee_type (str): 要摆放的咖啡饮品类型
+        # 查看是否需要自定义商品
+        if with_customization and check("customize_option_available"):
+            customize_coffee()  # 调整口味
         
-    Examples:
-        place_coffee("cappuccino")
-    """
-    # 放置指定位置的咖啡
-    execute(f"place_{coffee_type}_at_designated_area")
-
-def prepare_cappuccino():
-    # Stage 1：准备并定制卡布奇诺咖啡
-    prepare_coffee("cappuccino")
-
-# 调用函数来执行任务
-prepare_cappuccino()
-
-def ensure_item_ready_and_place(item: str, preparation_func: str, retry_cmd: str):
-    """确保某样物品准备好并放置到合适的位置
-
-    Examples:
-        ensure_item_ready_and_place("cappuccino", "prepare_cappuccino", "retry_prepare_cappuccino")
-    """
-    # 制作物品
-    execute(preparation_func)
-    
-    # 检查物品是否准备好
-    if check(f"{item}_ready"):
-        # 将准备好的物品进行放置
-        execute(f"place_{item}")
+        # 将商品加入购物车
+        execute("add_to_cart")
+        return True
     else:
-        # 若物品未准备好，则重试
-        execute(retry_cmd)
+        return False
 
-def order_cappuccino():
-    # 确保卡布奇诺已准备好并放置
-    ensure_item_ready_and_place("cappuccino", "prepare_cappuccino", "retry_prepare_cappuccino")
-
-order_cappuccino()
-
-def prepare_feeding_area_for_dog():
-    """确保喂食区域准备就绪，包括找到狗、将碗放在旁边和填充狗食
+def proceed_with_checkout():
+    """检查购物车并进行结账操作
 
     Examples:
-        prepare_feeding_area_for_dog()
+        proceed_with_checkout()
     """
-    # 检查狗是否在附近
-    if not find("dog"):
-        execute("locate_dog")
-    
-    # 检查狗碗是否在狗附近
-    if not find("dog_bowl_near_dog"):
-        execute("move_dog_bowl_near_dog")
+    # 检查购物车确认情况
+    if check("in_cart_confirmation"):
+        # 进行结账
+        execute("proceed_to_checkout")
+        
+        # 选择支付方式并支付
+        execute("select_payment_method")
+        execute("confirm_payment")
 
-    # 检查狗碗中是否有食物
-    if not check("food_in_dog_bowl"):
-        execute("fetch_dog_food")
-        execute("fill_dog_bowl_with_food")
-
-def feed_dog():
-    # 确保喂食区域准备就绪
-    prepare_feeding_area_for_dog()
-    
-    # 确保狗开始进食
-    if not check("dog_is_eating"):
-        execute("call_dog_to_bowl")
-
-def prepare_and_feed_pet(pet: str):
-    """准备好喂食区域并喂宠物
+def purchase_item_on_meituan(item: str, with_customization: bool = False):
+    """在美团上购买指定的物品，并处理选择逻辑
 
     Examples:
-        prepare_and_feed_pet("dog")
-        prepare_and_feed_pet("cat")
+        purchase_item_on_meituan("沪上阿姨_milk_tea")
+        purchase_item_on_meituan("奶茶", with_customization=True)
     """
-    # 确保喂食区域准备好
-    if not check(f"{pet}_feeding_area_ready"):
-        execute(f"prepare_feeding_area_for_{pet}")
+    # 查找物品并添加至购物车
+    item_found = select_and_add_item_to_cart(item, with_customization)
     
-    # 喂宠物
-    execute(f"feed_{pet}")
-
-def navigate_and_handle_package(target_floor: str):
-    """导航到目标楼层并处理包裹的获取和返回
-
-    Examples:
-        navigate_and_handle_package("package_floor")
-    """
-    # 确保我们当前在目标楼层
-    if not check(f"at_{target_floor}"):
-        execute(f"navigate_to_{target_floor}")
-    
-    # 在快递柜中导航并检索包裹
-    execute("navigate_and_retrieve_package")
-    
-    # 确保包裹已经成功取出
-    if not check("package_retrieved"):
-        print("没有找到快递柜或者快递不在快递柜中。")  # 记录失败日志
-    
-    # 返回到原来的楼层
-    execute("navigate_to_original_floor")
-    
-    # 确保已回到原始楼层
-    if not check("at_original_floor"):
-        print("没有成功返回原始楼层。")  # 记录失败日志
+    # 检查物品是否成功添加到购物车
+    if item_found:
+        # 从购物车核实，假设不需要额外定制，如果设置为True，则自定义
+        if with_customization:
+            execute("customize_item", item)
+    else:
+        print(f"无法找到物品 {item}，请检查商品是否存在。")  # 记录失败日志

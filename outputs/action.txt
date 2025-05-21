@@ -1,63 +1,43 @@
-## Task: 帮我去一下快递
+## Task: 帮我在美团上购买一杯“沪上阿姨”奶茶
 ### Original solution:
 ```python
 def solution():
-    # Stage 1： 确保我们当前在正确的楼层，即原始楼层
-    if not check("at_original_floor"):
-        # 如果当前不在原始楼层，向原始楼层导航
-        execute("navigate_to_original_floor")
-
-    # Stage 2： 导航到快递柜所在的楼层
-    execute("navigate_to_target_floor")
+    # Stage 1: 查找并选择“沪上阿姨”奶茶
+    item_found = select_and_add_item_to_cart("沪上阿姨_milk_tea")
     
-    # Stage 3： 在快递柜中导航并检索包裹
-    navigate_and_retrieve_package()
-
-    # Stage 4： 确保包裹已经成功取出
-    if not check("package_retrieved"):
-        raise Exception("没有找到快递柜或者快递不在快递柜中")
-
-    # Stage 5： 返回到原来的楼层
-    execute("navigate_to_original_floor")
-    
-    # Stage 6： 确保已回到原始楼层
-    if not check("at_original_floor"):
-        raise Exception("没有成功返回原始楼层")
-
-solution()
+    # Stage 2: 如果找到了“沪上阿姨”奶茶，检查是否需要自定义
+    if item_found:
+        # 这里假设不需要额外的定制，如果需要，请将with_customization设置为True
+        select_and_add_item_to_cart("沪上阿姨_milk_tea", with_customization=False)
+    else:
+        print("无法找到“沪上阿姨”奶茶，请检查商品是否存在。")
 ```
 
 
 
 ```python
-def navigate_and_handle_package(target_floor: str):
-    """导航到目标楼层并处理包裹的获取和返回
+def purchase_item_on_meituan(item: str, with_customization: bool = False):
+    """在美团上购买指定的物品，并处理选择逻辑
 
     Examples:
-        navigate_and_handle_package("package_floor")
+        purchase_item_on_meituan("沪上阿姨_milk_tea")
+        purchase_item_on_meituan("奶茶", with_customization=True)
     """
-    # 确保我们当前在目标楼层
-    if not check(f"at_{target_floor}"):
-        execute(f"navigate_to_{target_floor}")
+    # 查找物品并添加至购物车
+    item_found = select_and_add_item_to_cart(item, with_customization)
     
-    # 在快递柜中导航并检索包裹
-    execute("navigate_and_retrieve_package")
-    
-    # 确保包裹已经成功取出
-    if not check("package_retrieved"):
-        print("没有找到快递柜或者快递不在快递柜中。")  # 记录失败日志
-    
-    # 返回到原来的楼层
-    execute("navigate_to_original_floor")
-    
-    # 确保已回到原始楼层
-    if not check("at_original_floor"):
-        print("没有成功返回原始楼层。")  # 记录失败日志
+    # 检查物品是否成功添加到购物车
+    if item_found:
+        # 从购物车核实，假设不需要额外定制，如果设置为True，则自定义
+        if with_customization:
+            execute("customize_item", item)
+    else:
+        print(f"无法找到物品 {item}，请检查商品是否存在。")  # 记录失败日志
 ```
 
 ## Rewritten Trajectories
 ```python
 def solution():
-    # Stage 1: 导航到快递柜所在的楼层并处理包裹
-    navigate_and_handle_package("target_floor")
+    # Stage 1: 在美团上购买“沪上阿姨”奶茶
+    purchase_item_on_meituan("沪上阿姨_milk_tea", with_customization=False)
 ```
