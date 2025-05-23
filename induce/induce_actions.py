@@ -64,8 +64,9 @@ def extract_and_write_actions(
         existing_action_names = get_function_names(f.read())
     actions = extract_code_pieces(response, start="```python", end="```", do_split=False)
     new_actions, action_names = [], []
+    traj_names = get_function_names(actions[-1])
     for a in actions:
-        if ("def " in a) and ("def solution" not in a) and count_function_calls(a, 1):
+        if ("def " in a) and (traj_names[0] not in a) and count_function_calls(a, 1):
             a_names = get_function_names(a, existing_action_names)
             if len(a_names) > 0:
                 action_names.extend(a_names)
@@ -80,7 +81,6 @@ def extract_and_write_actions(
 
     custom_actions = CustomActionSet()
     code = ""
-    traj_names = get_function_names(actions[-1])
     if len(traj_names) == 1:
         program = "\n\n".join(new_actions + [actions[-1]])
         code = custom_actions.to_python_code(program, traj_names[0])
@@ -93,10 +93,17 @@ def extract_and_write_actions(
 
     try:
         print("="*15, " executing code", "="*15)
-        result = subprocess.run(['python', code_path], 
-                            check=True, 
-                            capture_output=True, 
-                            text=True)
+        # 假设你想模拟多次输入，每个输入值后加上 "\n" 表示回车确认。
+        # 根据需要调整重复次数和输入内容。
+        mock_inputs = "dummy_input\n" * 3  # 提供10次任意输入
+
+        result = subprocess.run(
+            ['python', code_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            input=mock_inputs  # 提供足够多的假输入
+        )
         print(result.stdout)
         print("="*50)
     except Exception as e:

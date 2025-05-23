@@ -30,6 +30,22 @@ def solution():
     # Stage 4： 将蓝色的吸管插入杯子中
     execute("put_straw_into_glass") # 放入吸管
 
+def solution():
+    # Stage 1: 询问葡萄的位置
+    grape_location = input("请输入葡萄所在的位置（例如 'in_refrigerator' 或 'on_kitchen_counter'）：")
+
+    # Stage 2: 找到和检索葡萄
+    find_and_retrieve_item(grape_location, "grapes", "search_for_grapes", "take_grapes")
+
+    # Stage 3: 检查洗手池是否有水槽
+    if not check("sink_has_water"):
+        # 如果没有水槽内没有水，执行打开水槽动作
+        execute("turn_on_sink_water")
+
+    # Stage 4: 清洗葡萄
+    while not check("grapes_are_clean"):
+        # 执行清洗葡萄动作，直到葡萄被清洗干净
+        execute("wash_grapes")
 """
 
 code_sys_prompt = """

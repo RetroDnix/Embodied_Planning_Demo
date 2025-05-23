@@ -33,7 +33,7 @@ def NL_planning(messages):
     except Exception as e:
         return f"生成回复时出错: {str(e)}"
 
-def code_planning(messages):
+def code_planning(messages, task):
     """
     通过Code进行提示
     """
@@ -43,10 +43,10 @@ def code_planning(messages):
         api_tools = custom_actions.describe(
             with_long_description=True,
             with_examples=True,
-            retrieval_query = messages[-1]["content"],
+            retrieval_query = task,
             num_retrieve = 5
         )
-        # print(f"api_tools{api_tools}")
+        print(f"api_tools:\n{api_tools}\n{'='*50}")
         # 无检索设置
         # custom_actions = CustomActionSet(retrievable_actions=False)
         # api_tools = custom_actions.describe(
@@ -59,7 +59,7 @@ def code_planning(messages):
         # api_tools = custom_actions.describe(
         #     with_long_description=True,
         #     with_examples=True,
-        #     retrieval_query = messages[-1]["content"],
+        #     retrieval_query = task,
         #     num_retrieve = 7
         # )
         formatted_sys_prompt = code_sys_prompt.format(api_tools=api_tools, code_example=code_example)

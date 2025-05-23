@@ -11,6 +11,13 @@ st.set_page_config(
     layout="wide"
 )
 
+if "nl_messages" not in st.session_state:
+    st.session_state.nl_messages = []
+
+if "code_messages" not in st.session_state:
+    st.session_state.code_messages = []
+
+
 # 初始化会话状态
 def init_session_state():
     if "history" not in st.session_state:
@@ -25,7 +32,7 @@ def init_session_state():
             }
 
     if "selected_history" not in st.session_state:
-        st.session_state.selected_history = None# 添加一个标志来避免重复保存到历史记录
+        st.session_state.selected_history = None # 添加一个标志来避免重复保存到历史记录
     if "already_saved" not in st.session_state:
         st.session_state.already_saved = False
 
@@ -83,11 +90,15 @@ def process_streaming_response(generator):
 # 生成响应的函数
 def generate_responses(prompt, code_placeholder, nl_placeholder):
     """生成代码规划和NL规划响应"""
-    messages = [{"role": "user", "content": prompt}]
+    user_message = {"role": "user", "content": prompt}
+    # 添加用户消息到各自的对话历史
+    st.session_state.nl_messages.append(user_message)
+    st.session_state.code_messages.append(user_message)
+    
     
     # 生成代码规划响应
     code_response = ""
-    code_generator = code_planning(messages)
+    code_generator = code_planning(st.session_state.code_messages, st.session_state.current_session["question"])
     for chunk in process_streaming_response(code_generator):
         code_response += chunk if isinstance(chunk, str) else str(chunk)
         # 使用占位符更新内容，而不是重新创建元素
@@ -110,15 +121,18 @@ def generate_responses(prompt, code_placeholder, nl_placeholder):
                     st.divider()
             # 显示原始代码响应
             st.markdown(code_response)
-
+    code_assistant_message = {"role": "assistant", "content": code_response}
+    st.session_state.code_messages.append(code_assistant_message)
     # 生成NL规划响应
     nl_response = ""
-    nl_generator = NL_planning(messages)
+    nl_generator = NL_planning(st.session_state.nl_messages)
     for chunk in process_streaming_response(nl_generator):
         nl_response += chunk if isinstance(chunk, str) else str(chunk)
         # 使用占位符更新内容，而不是重新创建元素
         nl_placeholder.markdown(nl_response)
-
+    # 添加NL响应到NL消息历史
+    nl_assistant_message = {"role": "assistant", "content": nl_response}
+    st.session_state.nl_messages.append(nl_assistant_message)
     return code_response, nl_response
 
 # 主页面布局
@@ -161,6 +175,9 @@ with st.sidebar:
     # 清除历史按钮
     if st.button("清除所有历史", type="primary", use_container_width=True):
         clear_all_history()
+    if st.button("重置任务", type="primary", use_container_width=True):
+        st.session_state.nl_messages = []
+        st.session_state.code_messages = []
 
 # 显示当前状态信息
 if display_data := (st.session_state.history[st.session_state.selected_history] if st.session_state.selected_history is not None 

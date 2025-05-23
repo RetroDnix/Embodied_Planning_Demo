@@ -91,30 +91,38 @@ def find(obj: str) -> bool:
     return len(vlm_find(obj)) > 0
 
 
-def brew_iced_americano():
-    # Stage 1：准备一杯冰美式咖啡
-    if not prepare_iced_coffee("americano"):
-        raise Exception("无法准备美式咖啡")
+def clean_item_until_done(item_clean_status: str, clean_action: str):
+    """清洗物品直到干净
 
-
-def customize_coffee():
-    """根据用户的偏好对咖啡进行自定义。
-    
     Examples:
-        customize_coffee()
+        clean_item_until_done("grapes_are_clean", "wash_grapes")
     """
-    # 检查是否用户需要糖或牛奶
-    if vlm_check("do you want sugar or milk"):
-        # 检索用户偏好
-        preference = vla("get user preference for sugar or milk")
-        # 根据偏好来添加糖或牛奶
-        if preference == "sugar":
-            execute("add_sugar")
-        elif preference == "milk":
-            execute("add_milk")
-        elif preference == "both":
-            execute("add_sugar")
-            execute("add_milk")
+    # 清洗物品直到状态变为清洗干净
+    while not check(item_clean_status):
+        execute(clean_action)
+
+
+def ensure_sufficient_condition_for_cleaning(water_source: str):
+    """确保洗涤物品所需的条件足够好。
+
+    Examples:
+        ensure_sufficient_condition_for_cleaning("sink_has_water")
+    """
+    # 检查水槽是否有水
+    if not check(water_source):
+        execute("turn_on_sink_water")
+
+
+def find_and_prepare_item(item_location: str, item: str, search_action: str, retrieve_action: str):
+    """找到物品并准备它，比如清洗或设置。
+
+    Examples:
+        find_and_prepare_item("on_kitchen_counter", "grapes", "search_for_grapes", "take_grapes")
+    """
+    # 找到和获取物品
+    if not find(item_location):
+        execute(search_action)
+    execute(retrieve_action)
 
 
 def find_and_retrieve_item(item_location: str, item: str, search_action: str, retrieve_action: str):
@@ -149,16 +157,6 @@ def go_downstairs(arrived_floor: str) -> None:
     """
     while not check("at_" + arrived_floor + "_floor"):  # 检查是否在一楼
         execute("take_stairs_down")
-
-
-def make_coffee():
-    # 步骤 1：准备黑咖啡
-    if prepare_coffee("black_coffee"):
-        # 步骤 2：根据用户偏好自定义咖啡
-        customize_coffee()
-
-    # 完成泡咖啡过程
-    print("您的咖啡已准备好享用!")
 
 
 def navigate_and_retrieve_package():
@@ -210,49 +208,6 @@ def navigate_to_target_floor(current_status: str, target_floor: str):
         execute(f"go_downstairs({target_floor})")
 
 
-def play_show_on_website(website_url: str, show_name: str, season: int, episode: int):
-    """打开指定网站，搜索并播放特定节目的一集
-
-    Examples:
-        play_show_on_website("https://www.iqiyi.com", "奔跑吧兄弟", 1, 2)
-    """
-    # 打开浏览器
-    execute("open_browser")
-    
-    # 导航到指定网站
-    execute(f"navigate_to_url {website_url}")
-    
-    # 搜索指定节目
-    execute(f"search_for_show {show_name}")
-    
-    # 定位到特定的季和集
-    execute(f"locate_season {season}")
-    execute(f"locate_episode {episode}")
-    
-    # 播放该集
-    execute("play_video")
-
-
-def prepare_and_load_clothes():
-    """整理衣物并放入洗衣机
-    
-    Examples:
-        prepare_and_load_clothes()
-    """
-    # Sorting clothes if not already sorted
-    if not check("clothes_sorted"):
-        execute("sort_clothes_by_color_or_material")
-
-    # Locate washing machine if not found
-    if not find("washing_machine"):
-        execute("locate_washing_machine")
-
-    # Open washing machine and add clothes
-    if not check("washing_machine_open"):
-        execute("open_washing_machine")
-    execute("add_clothes_to_washing_machine")
-
-
 def prepare_clothes_for_wash():
     """Prepare clothes for washing by sorting them
     
@@ -261,93 +216,6 @@ def prepare_clothes_for_wash():
     """
     if not check("clothes_sorted"):
         execute("sort_clothes_by_color_or_material")
-
-
-def prepare_coffee(item: str):
-    """准备并泡一杯指定类型的咖啡。
-
-    Args:
-        item (str): 咖啡类型
-
-    Returns:
-        bool: 成功则返回True，否则返回False
-
-    Examples:
-        prepare_coffee("black_coffee")
-    """
-    # 检查咖啡机是否准备就绪
-    if not check("coffee_machine_ready"):
-        execute("prepare_coffee_machine")
-    
-    # 确保咖啡杯已放入
-    if not check("cup_in_place"):
-        execute("place_cup_in_coffee_machine")
-
-    # 选择咖啡类型
-    if not check("coffee_type_selected"):
-        execute(f"select_{item}")
-
-    # 开始冲泡过程
-    execute("start_brewing_coffee")
-
-    # 一直检查直到冲泡完成
-    while not check("brewing_complete"):
-        wait(1000)  # 等待一段时间再检查
-
-    # 移除咖啡杯
-    execute("remove_cup_from_coffee_machine")
-
-    return True
-
-
-def prepare_coffee_drink(drink_type: str):
-    """准备指定类型的咖啡饮品，如果咖啡机未准备好则进行准备
-
-    Examples:
-        prepare_coffee_drink("cappuccino")
-    """
-    # 验证咖啡机是否准备好了
-    if not check("coffee_machine_ready"):
-        execute("prepare_coffee_machine")
-    
-    # 制作饮品
-    execute(f"brew_{drink_type}")
-    
-    # 根据用户的偏好进行调整
-    customize_coffee()
-
-
-def prepare_iced_coffee(coffee_type: str):
-    """准备一种类型的冰咖啡
-
-    Args:
-        coffee_type (str): 热咖啡的类型，例如"americano"或"espresso"
-        
-    Returns:
-        bool: 如果成功准备冰咖啡返回True，否则返回False
-
-    Examples:
-        prepare_iced_coffee("americano")
-    """
-    # 准备热咖啡
-    coffee_prepared = prepare_coffee(coffee_type)
-    if not coffee_prepared:
-        print(f"无法准备{coffee_type}咖啡")
-        return False
-
-    # 加入冰块直到杯子约满1/3
-    while not check("enough_ice_in_glass"):
-        execute("fetch_ice_into_glass")
-
-    # 将热咖啡倒入装有冰的杯子中
-    execute(f"pour_{coffee_type}_into_glass")
-
-    # 加入冷水直到杯子满
-    while not check("glass_is_full"):
-        execute("pour_cold_water_into_glass")
-
-    print(f"{coffee_type.capitalize()}冰咖啡准备完成")
-    return True
 
 
 def prepare_washing_machine():
@@ -361,26 +229,6 @@ def prepare_washing_machine():
 
     if not check("washing_machine_open"):
         execute("open_washing_machine")
-
-
-def remove_and_dry_clothes():
-    """把衣服从洗衣机里拿出来晾干
-
-    Examples:
-        remove_and_dry_clothes()
-    """
-    # Remove clothes from washing machine
-    execute("remove_clothes_from_washing_machine")
-
-    # Find drying place if needed
-    if not find("clothes_drying_place"):
-        execute("locate_clothes_drying_place")
-    
-    # Dry clothes using suitable method
-    if check("has_drying_machine"):
-        execute("use_drying_machine_to_dry_clothes")
-    else:
-        execute("hang_clothes_to_air_dry")
 
 
 def retrieve_package_from_box(target_floor: str, original_floor: str):
@@ -430,193 +278,71 @@ def return_to_original_floor(target_floor: str):
     execute(f"go_downstairs({target_floor})")
 
 
-def wash_and_dry_clothes():
-    """整理、洗涤和晾干衣物的流程
-
-    This function handles the process of washing and drying clothes.
-
-    Args:
-        None
-
-    Returns:
-        None
+def setup_table_and_place_item(item: str, search_table_action: str, place_item_action: str):
+    """找到桌子并摆放
 
     Examples:
-        wash_and_dry_clothes()
+        setup_table_and_place_item("table", "search_for_table", "place_plate_on_table")
     """
-    # 整理衣物
-    execute("prepare_clothes_for_wash")
-    
-    # 准备并装载衣物到洗衣机
-    execute("prepare_and_load_clothes")
-    
-    # 启动洗衣程序
-    execute("wash_clothes")
-    
-    # 洗完后进行衣物晾干
-    execute("remove_and_dry_clothes")
+    # 找到并摆放桌子
+    if not find(item):
+        execute(search_table_action)
+    execute(place_item_action)
 
 
-def wash_clothes():
-    """添加洗涤剂，选择洗涤模式，启动洗衣机
+def process_clothes():
+    """处理衣服：检索、检查褶皱并叠好后放入衣柜。
 
     Examples:
-        wash_clothes()
+        process_clothes()
     """
-    # Add detergent if not added
-    if not check("detergent_added"):
-        execute("add_detergent_to_washing_machine")
-    
-    # Select wash mode if not selected
-    if not check("wash_mode_selected"):
-        execute("select_wash_mode")
-    
-    # Start the washing machine
-    execute("start_washing_machine")
+    # 找到和检索衣服
+    find("clothes")
+    execute("retrieve_clothes")
+
+    # 检查衣服是否有褶皱并进行处理
+    if find("wrinkled_clothes"):
+        while check("clothes_still_wrinkled"):
+            execute("iron_clothes")
+
+    # 叠衣服并放入衣柜
+    execute("fold_clothes")
+    execute("place_clothes_into_wardrobe")
 
 
-def clear_sink():
-    """清理洗菜池及其周边
+def organize_clothes(item_type: str):
+    """对指定类型的衣物进行分类、检查、并执行适当操作以放入衣柜
 
     Examples:
-        clear_sink()
+        organize_clothes("pants")
+        organize_clothes("shirt")
     """
-    # 移除洗菜池中的所有餐具或杂物
-    while find("dish_in_sink"):
-        execute("remove_dish_from_sink")
+    # 检查是否有衣物需要分类
+    if not find("clothes"):
+        execute("retrieve_clothes")
 
-    # 移除洗菜池中的食物残渣
-    while find("food_debris_in_sink"):
-        execute("remove_food_debris_from_sink")
-    
-    # 清洁洗菜池表面
-    if not check("sink_surface_clean"):
-        execute("clean_sink_surface")
-    
-    # 确保排水口通畅
-    if not check("drain_clear"):
-        execute("clear_drain")
+    # 检查衣物是否有褶皱，并熨平褶皱
+    if find("wrinkled_clothes"):
+        while check("clothes_still_wrinkled"):
+            execute("iron_clothes")
 
-    # 清理洗菜池周边区域
-    if find("water_splotch_near_sink") or find("debris_near_sink"):
-        execute("clean_area_around_sink")
-
-
-def prepare_to_wash(item: str):
-    """准备清洗，清理水槽中的杂物并确保有水
-
-    Examples:
-        prepare_to_wash("fruit")
-    """
-    # 确保水槽没有杂物
-    if find("debris_in_sink"):
-        execute("clear_sink")
-    
-    # 确保有足够的水
-    if not check("enough_water"):
-        execute("open_water_tap")
-    
-    # 如果物品未在水下，则将其放入
-    if not check(f"{item}_under_water"):
-        execute(f"put_{item}_under_water")
-
-
-def wash_thoroughly(item: str):
-    """彻底清洗物品并关闭水源
-
-    Examples:
-        wash_thoroughly("fruit")
-    """
-    # 完全清洗物品
-    execute(f"wash_{item}_thoroughly")
-    
-    # 检查水龙头是否打开，如果是则关闭
-    if check("water_tap_open"):
-        execute("close_water_tap")
-
-
-def wash_fruit():
-    # Stage 1: 准备清洗水果
-    prepare_to_wash("fruit")
-    
-    # Stage 2: 完全清洗水果并关闭水源
-    wash_thoroughly("fruit")
-
-
-def open_and_search_in_app(app: str, search_item: str) -> bool:
-    """打开给定的应用并搜索指定的项目
-
-    Examples:
-        open_and_search_in_app("meituan", "霸王茶姬")
-    """
-    # 打开应用
-    execute(f"open_{app}_app")
-    
-    # 搜索项目
-    execute(f"search '{search_item}'")
-    
-    # 确认搜索结果中是否存在该项目
-    return find(f"{search_item}_shop")
-
-
-def select_and_add_item_to_cart(item: str, with_customization: bool = False) -> bool:
-    """选择商品并将其添加到购物车中，必要时进行自定义
-
-    Examples:
-        select_and_add_item_to_cart("霸王茶姬_milk_tea", with_customization=True)
-    """
-    # 浏览菜单并选择商品
-    if find(item):
-        execute(f"select_product '{item}'")
-        
-        # 查看是否需要自定义商品
-        if with_customization and check("customize_option_available"):
-            customize_coffee()  # 调整口味
-        
-        # 将商品加入购物车
-        execute("add_to_cart")
-        return True
+    # 根据衣物类型进行叠衣操作
+    if item_type == "pants":
+        execute("fold_pants")
     else:
-        return False
+        execute("fold_shirt")
 
-
-def proceed_with_checkout():
-    """检查购物车并进行结账操作
-
-    Examples:
-        proceed_with_checkout()
-    """
-    # 检查购物车确认情况
-    if check("in_cart_confirmation"):
-        # 进行结账
-        execute("proceed_to_checkout")
-        
-        # 选择支付方式并支付
-        execute("select_payment_method")
-        execute("confirm_payment")
-
-
-def purchase_item_on_meituan(item: str, with_customization: bool = False):
-    """在美团上购买指定的物品，并处理选择逻辑
-
-    Examples:
-        purchase_item_on_meituan("沪上阿姨_milk_tea")
-        purchase_item_on_meituan("奶茶", with_customization=True)
-    """
-    # 查找物品并添加至购物车
-    item_found = select_and_add_item_to_cart(item, with_customization)
-    
-    # 检查物品是否成功添加到购物车
-    if item_found:
-        # 从购物车核实，假设不需要额外定制，如果设置为True，则自定义
-        if with_customization:
-            execute("customize_item", item)
-    else:
-        print(f"无法找到物品 {item}，请检查商品是否存在。")  # 记录失败日志
+    # 将叠好的衣物放入衣柜
+    execute("place_clothes_into_wardrobe")
 
 def solution():
-    # Stage 1: 在美团上购买“沪上阿姨”奶茶
-    purchase_item_on_meituan("沪上阿姨_milk_tea", with_customization=False)        
+    # Stage 1: 分类衣物并放入衣柜
+    # 依据判断选择类型
+    if find("pants"):
+        item_type = "pants"
+    else:
+        item_type = "shirt"
+    organize_clothes(item_type)        
 def main():
     solution()
 
