@@ -67,7 +67,7 @@ col1, col2 = st.columns(2, border=True)
 with col1:
     st.subheader("代码规划")
     if state.response_code != None:
-        # print(state.response_code)
+        print(state.response_code)
         response = st.write_stream(state.response_code)
         state.code_messages.append({
             "role": "assistant",

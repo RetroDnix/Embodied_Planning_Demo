@@ -1,86 +1,90 @@
 ## Task: None
 ### Original solution:
-# ä»»åŠ¡ï¼šåƒé¥­
+```python
+def make_coffee():
+    # ½×¶Î1£º¼ì²é¿§·È»úÊÇ·ñ¿ÉÓÃ
+    if not check("coffee_machine_available"):
+        execute("find_coffee_machine")  # Èç¹û¿§·È»ú²»¿ÉÓÃ£¬Ñ°ÕÒ¿§·È»ú
+        if not check("coffee_machine_available"):
+            return  # Èç¹ûÈÔÈ»ÕÒ²»µ½¿§·È»ú£¬ÍË³öÈÎÎñ
 
-def solution():
-    # Stage 1ï¼šæ£€æŸ¥æ˜¯å¦æœ‰é£Ÿç‰©
-    if vlm_check("is there food on the table"):
-        execute("sit_at_table")  # å¦‚æœæ¡Œä¸Šæœ‰é£Ÿç‰©ï¼Œåˆ™åä¸‹
-    else:
-        # å¦‚æœæ²¡æœ‰é£Ÿç‰©ï¼Œå»ä¹°é£Ÿç‰©
-        buy_items_and_return("food")
-        execute("sit_at_table")  # è¿”å›ååä¸‹
-    
-    # Stage 2ï¼šæ£€æŸ¥æ˜¯å¦æœ‰é¤å…·
-    if find("cutlery"):
-        execute("pick_up_cutlery")  # å¦‚æœæ‰¾åˆ°é¤å…·ï¼Œåˆ™æ‹¿èµ·é¤å…·
-    else:
-        execute("search_area_for_cutlery")  # å¦åˆ™å¯»æ‰¾é¤å…·
-        if find("cutlery"):
-            execute("pick_up_cutlery")  # æ‰¾åˆ°é¤å…·åï¼Œæ‹¿èµ·é¤å…·
-        else:
-            execute("use_hands_to_eat")  # å¦‚æœä»æœªæ‰¾åˆ°é¤å…·ï¼Œåˆ™ä½¿ç”¨æ‰‹åƒ
-    
-    # Stage 3ï¼šåƒé¥­
-    execute("start_eating")
-    
-    # Stage 4ï¼šæ£€æŸ¥æ˜¯å¦åƒå®Œ
-    while not vlm_check("is the plate empty"):
-        execute("continue_eating")  # å¦‚æœç›˜å­æœªç©ºï¼Œåˆ™ç»§ç»­åƒ
-    
-    # Stage 5ï¼šç»“æŸç”¨é¤
-    execute("put_down_cutlery")  # æ”¾ä¸‹é¤å…·
-    execute("leave_table")  # ç¦»å¼€æ¡Œå­
+    # ½×¶Î2£º¼ì²éË®ÊÇ·ñ×ã¹»
+    if not check("sufficient_water"):
+        execute("add_water")  # Èç¹ûË®²»¹»£¬Ìí¼ÓË®
 
-solution()
+    # ½×¶Î3£º¼ì²é¿§·È¶¹ÊÇ·ñ×ã¹»
+    if not check("sufficient_coffee_beans"):
+        execute("add_coffee_beans")  # Èç¹û¿§·È¶¹²»¹»£¬Ìí¼Ó¿§·È¶¹
+
+    # ½×¶Î4£º¼ì²é±­×ÓÊÇ·ñ·ÅÖÃºÃ
+    if not find("coffee_cup"):
+        execute("place_coffee_cup")  # Èç¹ûÃ»ÓĞ±­×Ó£¬·ÅÖÃÒ»¸ö±­×Ó
+
+    # ½×¶Î5£º¿ªÊ¼ÖÆ×÷¿§·È
+    execute("start_coffee_machine")
+
+    # ½×¶Î6£ºµÈ´ı¿§·ÈÖÆ×÷Íê³É
+    while not check("coffee_ready"):
+        wait(10)  # Ã¿¸ô10Ãë¼ì²éÒ»´Î
+
+    # ½×¶Î7£ºÈ¡³ö¿§·È
+    execute("take_coffee")
+
+# Ö´ĞĞÖÆ×÷¿§·ÈµÄÈÎÎñ
+make_coffee()
+```
 
 
 
 ```python
-def prepare_to_eat():
-    """å‡†å¤‡åƒé¥­å¹¶ä»æ¡Œå­ä¸Šå®Œæˆç”¨é¤ã€‚
-    
-    æ£€æŸ¥é£Ÿç‰©æ˜¯å¦åœ¨æ¡Œä¸Šï¼Œå¯»æ‰¾é¤å…·ï¼Œåƒé¥­å¹¶åœ¨ç»“æŸåç¦»æ¡Œ
-    
+def prepare_coffee():
+    """×¼±¸²¢ÖÆ×÷¿§·È¡£Èç¹û»úÆ÷¡¢²ÄÁÏ»òÉè±¸ÓĞÎÊÌâ£¬½«»á½â¾öÕâĞ©ÎÊÌâ
+
     Args:
-        æ— 
-    
+        ÎŞ
+
     Returns:
-        æ— 
-    
+        None
+
     Examples:
-        prepare_to_eat()
+        prepare_coffee()
     """
-    # æ£€æŸ¥æ˜¯å¦æœ‰é£Ÿç‰©ï¼Œå¹¶åœ¨è¿”å›åæˆ–ç¡®è®¤æ¡Œä¸Šæœ‰é£Ÿç‰©æ—¶å°±åº§
-    if vlm_check("is there food on the table"):
-        execute("sit_at_table")
-    else:
-        buy_items_and_return("food")
-        execute("sit_at_table")
+    # ¼ì²é¿§·È»úÊÇ·ñ¿ÉÓÃ
+    if not check("coffee_machine_available"):
+        execute("find_coffee_machine")
+        if not check("coffee_machine_available"):
+            print("¿§·È»ú²»¿ÉÓÃ")  # ¼ÇÂ¼Ê§°ÜÈÕÖ¾
+            return
+
+    # È·±£Ë®ºÍ¿§·È¶¹ÊÇ³ä×ãµÄ
+    if not check("sufficient_water"):
+        execute("add_water")
     
-    # å¯»æ‰¾å¹¶æ‹¿èµ·é¤å…·ï¼Œå¦åˆ™ä½¿ç”¨æ‰‹
-    if find("cutlery"):
-        execute("pick_up_cutlery")
-    else:
-        execute("search_area_for_cutlery")
-        if find("cutlery"):
-            execute("pick_up_cutlery")
-        else:
-            execute("use_hands_to_eat")
-    
-    # å¼€å§‹åƒé¥­ï¼Œç›´åˆ°ç›˜å­ç©ºäº†æ‰åœæ­¢
-    execute("start_eating")
-    while not vlm_check("is the plate empty"):
-        execute("continue_eating")
-    
-    # ç»“æŸç”¨é¤å¹¶ç¦»æ¡Œ
-    execute("put_down_cutlery")
-    execute("leave_table")
+    if not check("sufficient_coffee_beans"):
+        execute("add_coffee_beans")
+
+    # È·±£±­×ÓÒÑ¾­·ÅÖÃºÃ
+    if not find("coffee_cup"):
+        execute("place_coffee_cup")
+
+    # Æô¶¯¿§·È»úÒÔÖÆ×÷¿§·È
+    execute("start_coffee_machine")
+
+    # ¼ì²é¿§·ÈÊÇ·ñ×¼±¸ºÃÁË
+    while not check("coffee_ready"):
+        print("µÈ´ı¿§·È×¼±¸ºÃ...")  # ¿ÉÒÔÍ¨¹ıUIÌáÊ¾»òÆäËû·½Ê½Í¨ÖªÓÃ»§
+        execute("wait")  # Note: `wait`Ó¦Ö¸ÏòÒ»¸ö¿ÉÓÃµÄ·½·¨
+    print("¿§·È×¼±¸ºÃÁË£¬ÏíÓÃÄúµÄÒûÁÏ£¡")  # Íê³ÉÌáÊ¾»òÈÕÖ¾
+
+    # È¡³ö¿§·È
+    execute("take_coffee")
+
 ```
 
 ## Rewritten Trajectories
+
 ```python
-def solution():
-    # ä»»åŠ¡ï¼šå‡†å¤‡åƒé¥­å¹¶å®Œæˆç”¨é¤
-    prepare_to_eat()
+def make_coffee():
+    # Ö´ĞĞÖÆ×÷¿§·ÈµÄÈÎÎñ
+    prepare_coffee()
 ```

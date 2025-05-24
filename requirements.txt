@@ -13,7 +13,6 @@ distro==1.9.0
 easydict==1.13
 -e git+https://github.com/youliangtan/edgeml.git@b4b8495b489e7c973187742d2f2fe9aa016d9aca#egg=edgeml
 etils==1.12.2
-evdev==1.6.1
 exceptiongroup==1.2.2
 fastjsonschema==2.21.1
 gitdb==4.0.12
