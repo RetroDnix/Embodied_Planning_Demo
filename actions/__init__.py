@@ -1,4 +1,4 @@
-from actions import store, base, utils
+from actions import store, base
 
 def get_functions(module, prefix='actions.') -> list:
     functions = []
@@ -15,9 +15,5 @@ def get_functions(module, prefix='actions.') -> list:
 ACTION_DICT = {
     "base": get_functions(base),
     "store": get_functions(store)
-}
-
-Fuction = {
-    "utils" : utils
 }
 

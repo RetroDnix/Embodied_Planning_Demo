@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 from typing import Optional, List, Tuple
 from induce.utils import count_function_calls, get_function_names, extract_code_pieces
 from custiom_action_set import CustomActionSet
+import subprocess
 # 加载环境变量
 load_dotenv()
 
@@ -31,7 +32,7 @@ def induce_actions(
     instruction_path: str,
     few_shot_path: str,
     test_query: str,
-    output_path: str = "output/action.txt",
+    output_path: str = "output/action.txt"
 ) -> Optional[List[str]]:
     """组合 prompt 信息并请求 OpenAI API 返回动作建议"""
     messages = [
@@ -53,15 +54,19 @@ def induce_actions(
 
     return response
 
-def extract_and_write_actions(response: str, write_action_path: str) -> Optional[List[str]]:
+def extract_and_write_actions(
+        response: str, 
+        write_action_path: str,
+        code_path: str = "output/action.txt") -> Optional[List[str]]:
     """提取代码段并写入文件，如果成功则返回路径和函数名列表"""
     print("** Start Evaluating Response **")
     with open(write_action_path, 'r', encoding='utf-8', errors='ignore') as f:
         existing_action_names = get_function_names(f.read())
     actions = extract_code_pieces(response, start="```python", end="```", do_split=False)
     new_actions, action_names = [], []
+    traj_names = get_function_names(actions[-1])
     for a in actions:
-        if ("def " in a) and ("def solution" not in a) and count_function_calls(a, 1):
+        if ("def " in a) and (traj_names[0] not in a) and count_function_calls(a, 1):
             a_names = get_function_names(a, existing_action_names)
             if len(a_names) > 0:
                 action_names.extend(a_names)
@@ -74,23 +79,42 @@ def extract_and_write_actions(response: str, write_action_path: str) -> Optional
     )
     if len(new_actions) == 0: return None, None
 
-    custom_actions = CustomActionSet(retrievable_actions=False)
+    custom_actions = CustomActionSet()
     code = ""
-    if "def solution" in actions[-1]:
+    if len(traj_names) == 1:
         program = "\n\n".join(new_actions + [actions[-1]])
-        code = custom_actions.to_python_code(program)
+        code = custom_actions.to_python_code(program, traj_names[0])
+
+    if code != "":
+        with open(code_path, 'w', encoding='utf-8') as f:
+            f.write(code)
+    else:
+        return None
 
     try:
-        # 拼接代码片段执行
-        if code !="":
-            exec(code, {}, {})  # 执行代码，空 namespace 防止污染环境
-        else:
-            return None
+        print("="*15, " executing code", "="*15)
+        # 假设你想模拟多次输入，每个输入值后加上 "\n" 表示回车确认。
+        # 根据需要调整重复次数和输入内容。
+        mock_inputs = "dummy_input\n" * 3  # 提供10次任意输入
+
+        result = subprocess.run(
+            ['python', code_path],
+            check=True,
+            capture_output=True,
+            text=True,
+            input=mock_inputs  # 提供足够多的假输入
+        )
+        print(result.stdout)
+        print("="*50)
     except Exception as e:
         print("代码执行出错:", e)
         return None
-    with open(write_action_path, 'a+') as fw:
-        fw.write('\n\n'+ '\n\n'.join(new_actions))
+    
+    custom_actions.add_functions_from_strings(
+        func_str_list = new_actions,
+        action_name_list = action_names,
+        rebuild_index = True
+    )
     return action_names
 
 
@@ -107,6 +131,7 @@ def induce(query: str, response: str):
     output_dir = os.path.join("outputs")  # Create the base outputs directory
     os.makedirs(output_dir, exist_ok=True)  # Ensure directory exists
     output_file = os.path.join(output_dir, "action.txt")  # Full file path
+    code_path = os.path.join(output_dir, "action.py") 
 
     # 调用 API 获取响应
     responses = induce_actions(
@@ -114,6 +139,11 @@ def induce(query: str, response: str):
         instruction_path=instruction_path, 
         few_shot_path=few_shot_path, 
         test_query=query,
-        output_path=output_file)
+        output_path=output_file
+    )
 
-    extract_and_write_actions(responses, write_action_path)
+    extract_and_write_actions(
+        response=responses, 
+        write_action_path = write_action_path,
+        code_path = code_path
+    )

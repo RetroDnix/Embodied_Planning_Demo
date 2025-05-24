@@ -27,7 +27,7 @@ def solution():
 def store_item_in_fridge(item: str):
     """如果物品尚未放入冰箱，则将其存放进去
 
-    示例:
+    Examples:
         store_item_in_fridge("strawberry")
     """
     # 确保冰箱是打开的
@@ -54,5 +54,5 @@ def store_item_in_fridge(item: str):
 ```
 def solution():
     # Stage 1: 把草莓放进冰箱
-    store_item_in_fridge*("strawberry")
+    store_item_in_fridge("strawberry")
 ```

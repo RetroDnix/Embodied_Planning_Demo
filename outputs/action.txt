@@ -1,6 +1,7 @@
-## Task: None
+## Task: 你需要为衣服做分类，是裤子还是衣服。详细指定计划应该怎么叠衣服
 ### Original solution:
 ```python
+<<<<<<< HEAD
 def make_coffee():
     # 阶段1：检查咖啡机是否可用
     if not check("coffee_machine_available"):
@@ -32,11 +33,41 @@ def make_coffee():
 
 # 执行制作咖啡的任务
 make_coffee()
+=======
+def solution():
+    # Stage 1: 找到和检索衣服
+    find("clothes")
+    execute("retrieve_clothes")
+
+    # Stage 2: 分类衣物
+    if find("pants"):
+        item_type = "pants"
+    else:
+        item_type = "shirt"
+
+    # Stage 3: 检查衣物是否有褶皱
+    if find("wrinkled_clothes"):
+        # 如果有褶皱，执行熨平操作
+        while check("clothes_still_wrinkled"):
+            execute("iron_clothes")
+
+    # Stage 4: 叠衣物方式依据其类型
+    if item_type == "pants":
+        # 以裤子的方式进行叠衣
+        execute("fold_pants")
+    else:
+        # 以衬衫的方式进行叠衣
+        execute("fold_shirt")
+
+    # Stage 5: 将叠好的衣物放进衣柜
+    execute("place_clothes_into_wardrobe")
+>>>>>>> origin/czguo
 ```
 
 
 
 ```python
+<<<<<<< HEAD
 def prepare_coffee():
     """准备并制作咖啡。如果机器、材料或设备有问题，将会解决这些问题
 
@@ -79,12 +110,50 @@ def prepare_coffee():
     # 取出咖啡
     execute("take_coffee")
 
+=======
+def organize_clothes(item_type: str):
+    """对指定类型的衣物进行分类、检查、并执行适当操作以放入衣柜
+
+    Examples:
+        organize_clothes("pants")
+        organize_clothes("shirt")
+    """
+    # 检查是否有衣物需要分类
+    if not find("clothes"):
+        execute("retrieve_clothes")
+
+    # 检查衣物是否有褶皱，并熨平褶皱
+    if find("wrinkled_clothes"):
+        while check("clothes_still_wrinkled"):
+            execute("iron_clothes")
+
+    # 根据衣物类型进行叠衣操作
+    if item_type == "pants":
+        execute("fold_pants")
+    else:
+        execute("fold_shirt")
+
+    # 将叠好的衣物放入衣柜
+    execute("place_clothes_into_wardrobe")
+>>>>>>> origin/czguo
 ```
 
 ## Rewritten Trajectories
 
 ```python
+<<<<<<< HEAD
 def make_coffee():
     # 执行制作咖啡的任务
     prepare_coffee()
 ```
+=======
+def solution():
+    # Stage 1: 分类衣物并放入衣柜
+    # 依据判断选择类型
+    if find("pants"):
+        item_type = "pants"
+    else:
+        item_type = "shirt"
+    organize_clothes(item_type)
+```
+>>>>>>> origin/czguo

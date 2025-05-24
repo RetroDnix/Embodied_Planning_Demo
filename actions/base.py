@@ -1,6 +1,6 @@
-from actions.vla import vla
-from actions.vlm import vlm_check, vlm_find
-from actions.utils import wait
+from base.vla import vla
+from base.vlm import vlm_check, vlm_find
+from base.utils import wait
 
 # --------------------------------------------------
 # Base Robot API

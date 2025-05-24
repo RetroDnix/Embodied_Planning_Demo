@@ -1,10 +1,10 @@
 import time
 
-def wait(time: int):
+def wait(sleep_time: int):
     """wait for time
 
     Examples:
         wait(100)
     
     """
-    time.sleep(1000)
+    time.sleep(sleep_time)
