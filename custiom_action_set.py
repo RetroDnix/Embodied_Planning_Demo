@@ -10,7 +10,7 @@ from dotenv import load_dotenv
 # 加载环境变量
 load_dotenv()
 
-GPT_MODEL = 'text-embedding-ada-002'
+GPT_MODEL = 'Embedding-V1'
 
 OPENAI_API_KEY = "sk-DRxEVD9NJPfTNZn9852f350063B249Dc9aD49503B1Ad70Ad"
 OPENAI_API_BASE = "http://vip.ooo.cool/v1"

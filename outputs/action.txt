@@ -1,73 +1,68 @@
-## Task: ÄãĞèÒªÎªÒÂ·ş×ö·ÖÀà£¬ÊÇ¿ã×Ó»¹ÊÇÒÂ·ş¡£ÏêÏ¸Ö¸¶¨¼Æ»®Ó¦¸ÃÔõÃ´µşÒÂ·ş
+## Task: å¸®æˆ‘ä¸‹æ¥¼å–ä¸ªå¤–å–
 ### Original solution:
 ```python
 def solution():
-    # Stage 1: ÕÒµ½ºÍ¼ìË÷ÒÂ·ş
-    find("clothes")
-    execute("retrieve_clothes")
+    # Step 1: ç¡®è®¤å¤–å–æ˜¯å¦åˆ°è¾¾
+    if not check("å¤–å–åˆ°è¾¾"):
+        return  # å¦‚æœå¤–å–æ²¡æœ‰åˆ°è¾¾ï¼Œä»»åŠ¡ç»“æŸ
 
-    # Stage 2: ·ÖÀàÒÂÎï
-    if find("pants"):
-        item_type = "pants"
-    else:
-        item_type = "shirt"
+    # Step 2: æ£€æŸ¥æœºå™¨äººå½“å‰æ¥¼å±‚
+    if not check("æœºå™¨äººåœ¨ä¸€æ¥¼"):
+        go_downstairs("1")  # å¦‚æœä¸åœ¨ä¸€æ¥¼ï¼Œå¯¼èˆªåˆ°ä¸€æ¥¼
 
-    # Stage 3: ¼ì²éÒÂÎïÊÇ·ñÓĞñŞÖå
-    if find("wrinkled_clothes"):
-        # Èç¹ûÓĞñŞÖå£¬Ö´ĞĞìÙÆ½²Ù×÷
-        while check("clothes_still_wrinkled"):
-            execute("iron_clothes")
+    # Step 3: ç¡®è®¤é—¨æ˜¯å¦å…³é—­
+    if not check("é—¨å·²æ‰“å¼€"):
+        open("é—¨")  # å¦‚æœé—¨æ˜¯å…³é—­çš„ï¼Œæ‰“å¼€é—¨
 
-    # Stage 4: µşÒÂÎï·½Ê½ÒÀ¾İÆäÀàĞÍ
-    if item_type == "pants":
-        # ÒÔ¿ã×ÓµÄ·½Ê½½øĞĞµşÒÂ
-        execute("fold_pants")
-    else:
-        # ÒÔ³ÄÉÀµÄ·½Ê½½øĞĞµşÒÂ
-        execute("fold_shirt")
+    # Step 4: æ‰¾åˆ°å¤–å–ä½ç½®
+    if not find("å¤–å–"):
+        explore("ä¸€æ¥¼")  # å¦‚æœå¤–å–ä¸åœ¨è§†é‡ä¸­ï¼Œæ¢ç´¢ä¸€æ¥¼ä»¥å¯»æ‰¾å¤–å–
 
-    # Stage 5: ½«µşºÃµÄÒÂÎï·Å½øÒÂ¹ñ
-    execute("place_clothes_into_wardrobe")
+    # Step 5: æ‹¿èµ·å¤–å–
+    grab("å¤–å–")  # æ‹¿èµ·å¤–å–
+
+    # Step 6: è¿”å›åˆ°å®¶ä¸­æŒ‡å®šä½ç½®
+    go_to("æŒ‡å®šäº¤ä»˜ä½ç½®")  # å¯¼èˆªåˆ°äº¤ä»˜ä½ç½®
+
+    # Step 7: æ”¾ä¸‹å¤–å–
+    put_down("å¤–å–")  # å°†å¤–å–æ”¾ä¸‹
 ```
 
 
 
 ```python
-def organize_clothes(item_type: str):
-    """¶ÔÖ¸¶¨ÀàĞÍµÄÒÂÎï½øĞĞ·ÖÀà¡¢¼ì²é¡¢²¢Ö´ĞĞÊÊµ±²Ù×÷ÒÔ·ÅÈëÒÂ¹ñ
+def retrieve_delivery(location: str, target_floor: str):
+    """ä»æŒ‡å®šçš„æ¥¼å±‚æ¥æ”¶å¤–å–å¹¶æ”¾ç½®åˆ°ç›®æ ‡ä½ç½®ã€‚
 
     Examples:
-        organize_clothes("pants")
-        organize_clothes("shirt")
+        retrieve_delivery("ä¸€æ¥¼", "æŒ‡å®šäº¤ä»˜ä½ç½®")
     """
-    # ¼ì²éÊÇ·ñÓĞÒÂÎïĞèÒª·ÖÀà
-    if not find("clothes"):
-        execute("retrieve_clothes")
+    # Step 1: ç¡®è®¤å¤–å–æ˜¯å¦åˆ°è¾¾
+    if not check("å¤–å–åˆ°è¾¾"):
+        print("å¤–å–å°šæœªåˆ°è¾¾ã€‚")
+        return
+    
+    # Step 2: å¦‚æœæœºå™¨äººä¸åœ¨ç›®æ ‡æ¥¼å±‚ï¼Œåˆ™å¯¼èˆªåˆ°è¯¥æ¥¼å±‚
+    if not check(f"æœºå™¨äººåœ¨{target_floor}"):
+        go_downstairs(target_floor)  # å¯¼èˆªåˆ°ç›®æ ‡æ¥¼å±‚
 
-    # ¼ì²éÒÂÎïÊÇ·ñÓĞñŞÖå£¬²¢ìÙÆ½ñŞÖå
-    if find("wrinkled_clothes"):
-        while check("clothes_still_wrinkled"):
-            execute("iron_clothes")
+    # Step 3: ç¡®ä¿é—¨æ˜¯æ‰“å¼€çš„
+    if not check("é—¨å·²æ‰“å¼€"):
+        open("é—¨")  # å¦‚æœé—¨æ˜¯å…³é—­çš„ï¼Œæ‰“å¼€é—¨
 
-    # ¸ù¾İÒÂÎïÀàĞÍ½øĞĞµşÒÂ²Ù×÷
-    if item_type == "pants":
-        execute("fold_pants")
-    else:
-        execute("fold_shirt")
+    # Step 4: å‘ç°å’Œæ”¶é›†å¤–å–
+    if not find("å¤–å–"):
+        explore(location)  # åœ¨æŒ‡å®šä½ç½®å¯»æ‰¾å¤–å–
+        grab("å¤–å–")  # æ‹¿èµ·å¤–å–
 
-    # ½«µşºÃµÄÒÂÎï·ÅÈëÒÂ¹ñ
-    execute("place_clothes_into_wardrobe")
+    # Step 5: å¯¼èˆªåˆ°äº¤ä»˜ä½ç½®å¹¶æ”¾ä¸‹å¤–å–
+    go_to("æŒ‡å®šäº¤ä»˜ä½ç½®")
+    put_down("å¤–å–")  # æ”¾ä¸‹å¤–å–
 ```
-
 
 ## Rewritten Trajectories
 ```python
 def solution():
-    # Stage 1: ·ÖÀàÒÂÎï²¢·ÅÈëÒÂ¹ñ
-    # ÒÀ¾İÅĞ¶ÏÑ¡ÔñÀàĞÍ
-    if find("pants"):
-        item_type = "pants"
-    else:
-        item_type = "shirt"
-    organize_clothes(item_type)
+    # Step 1: ä»ä¸€æ¥¼å–å¤–å–å¹¶æ”¾ç½®åˆ°æŒ‡å®šäº¤ä»˜ä½ç½®
+    retrieve_delivery("ä¸€æ¥¼", "1")
 ```

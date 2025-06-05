@@ -68,8 +68,89 @@ def check(condition: str) -> bool:
     return vlm_check(condition)
 
 
+def clean(object: str) -> None:
+    """Clean an object or surface
+    Examples:
+        clean("table")
+        clean("floor")
+    """
+    vla(f"clean {object}")
+
+
+def close(object: str) -> None:
+    """Close an object, such as a door or a container
+    Examples:
+        close("door")
+        close("box")
+    """
+    vla(f"close {object}")
+
+
+def cool(object: str) -> None:
+    """Cool an object, such as food
+    Examples:
+        cool("pizza")
+        cool("drink")
+    """
+    vla(f"cool {object}")
+
+
+def cut(object: str) -> None:
+    """Cut an object, such as food
+    Examples:
+        cut("apple")
+        cut("bread")
+    """
+    vla(f"cut {object}")
+
+
+def dip(object: str, container: str) -> None:
+    """Dip an object into a container
+    Examples:
+        dip("spoon", "soup")
+        dip("apple", "water")
+    """
+    vla(f"dip {object} into {container}")
+
+
+def drink(container: str) -> None:
+    """Drink from a container
+    Examples:
+        drink("cup")
+        drink("bottle")
+    """
+    vla(f"drink from {container}")
+
+
+def drop(object: str) -> None:
+    """Drop an object
+    Examples:
+        drop("book")
+        drop("bag")
+    """
+    vla(f"drop {object}")
+
+
+def eat(object: str) -> None:
+    """Eat an object, such as food
+    Examples:
+        eat("apple")
+        eat("sandwich")
+    """
+    vla(f"eat {object}")
+
+
+def examine(object: str) -> None:
+    """Examine an object in the environment
+    Examples:
+        examine("apple")
+        examine("machine")
+    """
+    vla(f"examine {object}")
+
+
 def execute(command: str) -> None:
-    """Execute primitive robot action
+    """Execute primitive robot action other than those defined
     
     Examples:
         execute("turn_right_90deg")
@@ -77,6 +158,24 @@ def execute(command: str) -> None:
     
     """
     vla(command)
+
+
+def explore(area: str) -> None:
+    """Explore a specified area
+    Examples:
+        explore("room")
+        explore("garden")
+    """
+    vla(f"explore {area}")
+
+
+def fill(container: str, liquid: str) -> None:
+    """Fill a container with a specified liquid
+    Examples:
+        fill("cup", "water")
+        fill("bottle", "juice")
+    """
+    vla(f"fill {container} with {liquid}")
 
 
 def find(obj: str) -> bool:
@@ -91,61 +190,384 @@ def find(obj: str) -> bool:
     return len(vlm_find(obj)) > 0
 
 
-def clean_item_until_done(item_clean_status: str, clean_action: str):
-    """清洗物品直到干净
-
+def go_to(location: str) -> None:
+    """Go to a specific location
     Examples:
-        clean_item_until_done("grapes_are_clean", "wash_grapes")
+        go_to("kitchen")
+        go_to("room_2")
     """
-    # 清洗物品直到状态变为清洗干净
-    while not check(item_clean_status):
-        execute(clean_action)
+    vla(f"go to {location}")
 
 
-def ensure_sufficient_condition_for_cleaning(water_source: str):
-    """确保洗涤物品所需的条件足够好。
-
+def grab(object: str) -> None:
+    """Grab a specific object
     Examples:
-        ensure_sufficient_condition_for_cleaning("sink_has_water")
+        grab("book")
+        grab("pen")
     """
-    # 检查水槽是否有水
-    if not check(water_source):
-        execute("turn_on_sink_water")
+    vla(f"grab {object}")
 
 
-def find_and_prepare_item(item_location: str, item: str, search_action: str, retrieve_action: str):
-    """找到物品并准备它，比如清洗或设置。
-
+def greet(person: str) -> None:
+    """Greet a person
     Examples:
-        find_and_prepare_item("on_kitchen_counter", "grapes", "search_for_grapes", "take_grapes")
+        greet("John")
+        greet("Alice")
     """
-    # 找到和获取物品
-    if not find(item_location):
-        execute(search_action)
-    execute(retrieve_action)
+    vla(f"greet {person}")
 
 
-def find_and_retrieve_item(item_location: str, item: str, search_action: str, retrieve_action: str):
-    """找到指定位置的物品并取出
-
-    Args:
-        item_location (str): 物品所在位置的识别符，例如‘at_delivery_box’
-        item (str): 要检索的物品，例如‘package’
-        search_action (str): 寻找物品的动作，例如‘search_for_delivery_box’
-        retrieve_action (str): 取出物品的动作，例如‘take_package_from_delivery_box’
-
+def heat(object: str) -> None:
+    """Heat an object, such as food
     Examples:
-        find_and_retrieve_item("at_delivery_box", "package", "search_for_delivery_box", "take_package_from_delivery_box")
+        heat("pizza")
+        heat("water")
     """
-    while not check(item_location):
-        if not find(item_location):
-            execute(search_action)
-        execute(f"move_towards_{item_location}")
-    
-    if not find(item):
-        raise Exception(f"{item} 不在当前位置")
-    
-    execute(retrieve_action)
+    vla(f"heat {object}")
+
+
+def inventory() -> None:
+    """Check the robot's inventory
+    Examples:
+        inventory()
+    """
+    vla("inventory")
+
+
+def lie() -> None:
+    """Lie down
+    Examples:
+        lie()
+    """
+    vla("lie down")
+
+
+def look_at(object: str) -> None:
+    """Look at a specific object
+    Examples:
+        look_at("tree")
+        look_at("book")
+    """
+    vla(f"look at {object}")
+
+
+def move(direction: str) -> None:
+    """Move in a specified direction
+    Examples:
+        move("forward")
+        move("backward")
+    """
+    vla(f"move {direction}")
+
+
+def navigate(direction: str) -> None:
+    """Navigate in a specified direction
+    Examples:
+        navigate("north")
+        navigate("left")
+    """
+    vla(f"navigate {direction}")
+
+
+def open(object: str) -> None:
+    """Open an object, such as a door or a container
+    Examples:
+        open("door")
+        open("box")
+    """
+    vla(f"open {object}")
+
+
+def pick_up(object: str) -> None:
+    """Pick up an object
+    Examples:
+        pick_up("apple")
+        pick_up("Coat")
+    """
+    vla(f"pick up {object}")
+
+
+def place(object: str, location: str) -> None:
+    """Place an object at a specified location
+    Examples:
+        place("apple", "table")
+        place("Coat", "rack")
+    """
+    vla(f"place {object} at {location}")
+
+
+def plug_in(device: str) -> None:
+    """Plug in a device
+    Examples:
+        plug_in("charger")
+        plug_in("laptop")
+    """
+    vla(f"plug in {device}")
+
+
+def plug_out(device: str) -> None:
+    """Unplug a device
+    Examples:
+        plug_out("charger")
+        plug_out("laptop")
+    """
+    vla(f"plug out {device}")
+
+
+def point_at(object: str) -> None:
+    """Point at a specific object
+    Examples:
+        point_at("tree")
+        point_at("book")
+    """
+    vla(f"point at {object}")
+
+
+def pour(container: str, liquid: str) -> None:
+    """Pour a liquid from one container to another
+    Examples:
+        pour("bottle", "cup")
+        pour("jug", "glass")
+    """
+    vla(f"pour {liquid} from {container}")
+
+
+def power_off() -> None:
+    """Power off the robot or system
+    Examples:
+        power_off()
+    """
+    vla("power off")
+
+
+def power_on() -> None:
+    """Power on the robot or system
+    Examples:
+        power_on()
+    """
+    vla("power on")
+
+
+def pull(object: str) -> None:
+    """Pull an object
+    Examples:
+        pull("door")
+        pull("rope")
+    """
+    vla(f"pull {object}")
+
+
+def push(object: str) -> None:
+    """Push an object
+    Examples:
+        push("box")
+        push("door")
+    """
+    vla(f"push {object}")
+
+
+def put(object: str, location: str) -> None:
+    """Put an object at a specified location
+    Examples:
+        put("apple", "table")
+        put("Coat", "hanger")
+    """
+    vla(f"put {object} at {location}")
+
+
+def put_down(object: str) -> None:
+    """Put down an object
+    Examples:
+        put_down("book")
+        put_down("bag")
+    """
+    vla(f"put down {object}")
+
+
+def put_off(object: str) -> None:
+    """Take off an item of clothing or accessory
+    Examples:
+        put_off("hat")
+        put_off("jacket")
+    """
+    vla(f"put off {object}")
+
+
+def put_on(object: str) -> None:
+    """Put on an item of clothing or accessory
+    Examples:
+        put_on("hat")
+        put_on("jacket")
+    """
+    vla(f"put on {object}")
+
+
+def read(object: str) -> None:
+    """Read an object, such as a book or a sign
+    Examples:
+        read("book")
+        read("sign")
+    """
+    vla(f"read {object}")
+
+
+def release(object: str) -> None:
+    """Release an object
+    Examples:
+        release("ball")
+        release("item")
+    """
+    vla(f"release {object}")
+
+
+def rinse(object: str) -> None:
+    """Rinse an object
+    Examples:
+        rinse("plate")
+        rinse("vegetables")
+    """
+    vla(f"rinse {object}")
+
+
+def scrub(object: str) -> None:
+    """Scrub an object or surface
+    Examples:
+        scrub("floor")
+        scrub("pot")
+    """
+    vla(f"scrub {object}")
+
+
+def sleep() -> None:
+    """Sleep
+    Examples:
+        sleep()
+    """
+    vla("sleep")
+
+
+def slice(object: str) -> None:
+    """Slice an object, such as food
+    Examples:
+        slice("apple")
+        slice("bread")
+    """
+    vla(f"slice {object}")
+
+
+def squeeze(object: str) -> None:
+    """Squeeze an object
+    Examples:
+        squeeze("sponge")
+        squeeze("cloth")
+    """
+    vla(f"squeeze {object}")
+
+
+def switch_off(object: str) -> None:
+    """Switch off a device or machine
+    Examples:
+        switch_off("light")
+        switch_off("machine")
+    """
+    vla(f"switch off {object}")
+
+
+def switch_on(object: str) -> None:
+    """Switch on a device or machine
+    Examples:
+        switch_on("light")
+        switch_on("machine")
+    """
+    vla(f"switch on {object}")
+
+
+def take(object: str) -> None:
+    """Take an object
+    Examples:
+        take("book")
+        take("phone")
+    """
+    vla(f"take {object}")
+
+
+def toggle_off(object: str) -> None:
+    """Turn off an object, such as a light or a machine
+    Examples:
+        toggle_off("light")
+        toggle_off("machine")
+    """
+    vla(f"toggle off {object}")
+
+
+def toggle_on(object: str) -> None:
+    """Turn on an object, such as a light or a machine
+    Examples:
+        toggle_on("light")
+        toggle_on("machine")
+    """
+    vla(f"toggle on {object}")
+
+
+def turn_off(object: str) -> None:
+    """Turn off a device or system
+    Examples:
+        turn_off("air_conditioner")
+        turn_off("fan")
+    """
+    vla(f"turn off {object}")
+
+
+def turn_on(object: str) -> None:
+    """Turn on a device or system
+    Examples:
+        turn_on("air_conditioner")
+        turn_on("fan")
+    """
+    vla(f"turn on {object}")
+
+
+def type(command: str) -> None:
+    """Type a command or text
+    Examples:
+        type("hello world")
+    """
+    vla(f"type {command}")
+
+
+def wake_up() -> None:
+    """Wake up
+    Examples:
+        wake_up()
+    """
+    vla("wake up")
+
+
+def walk(destination: str) -> None:
+    """Walk to a specific destination
+    Examples:
+        walk("door")
+        walk("desk")
+    """
+    vla(f"walk to {destination}")
+
+
+def wash(object: str) -> None:
+    """Wash an object or surface
+    Examples:
+        wash("dish")
+        wash("clothes")
+    """
+    vla(f"wash {object}")
+
+
+def wipe(object: str) -> None:
+    """Wipe an object or surface
+    Examples:
+        wipe("table")
+        wipe("window")
+    """
+    vla(f"wipe {object}")
 
 
 def go_downstairs(arrived_floor: str) -> None:
@@ -155,57 +577,8 @@ def go_downstairs(arrived_floor: str) -> None:
         go_downstairs("1")
         go_downstairs("basement")
     """
-    while not check("at_" + arrived_floor + "_floor"):  # 检查是否在一楼
-        execute("take_stairs_down")
-
-
-def navigate_and_retrieve_package():
-    """在快递柜中导航并检索包裹
-
-    确保在快递柜处，打开它，检索包裹，并返回到原来的楼层。
-
-    调用示例:
-        navigate_and_retrieve_package()
-
-    Raises:
-        Exception: 如果没有找到快递柜或者快递不在快递柜中。
-    """
-    # 找到快递柜
-    if not find("delivery box"):
-        raise Exception("无法找到快递柜")
-    
-    # 到达快递柜所在楼层
-    if not check("at_delivery_box_floor"):
-        go_downstairs("delivery_box_floor_name_or_number")
-    
-    # 移动到快递柜前
-    while not check("at_delivery_box"):
-        execute("move_towards_delivery_box")
-    
-    # 打开快递柜
-    execute("open_delivery_box")
-    
-    # 检查并取出快递包裹
-    if not find("package"):
-        raise Exception("快递不在快递柜中")
-    execute("take_package_from_delivery_box")
-    
-    # 返回原来的楼层
-    go_downstairs("original_floor_name_or_number")
-
-
-def navigate_to_target_floor(current_status: str, target_floor: str):
-    """确保到达目标楼层
-
-    Args:
-        current_status (str): 当前状态标识符，例如‘at_delivery_box_floor’
-        target_floor (str): 目标楼层标识符，例如‘delivery_box_floor’
-
-    Examples:
-        navigate_to_target_floor("at_delivery_box_floor", "delivery_box_floor")
-    """
-    if not check(current_status):
-        execute(f"go_downstairs({target_floor})")
+    while not check("at_" + arrived_floor + "_floor"):  # 检查是否在指定楼层
+        move("downstairs")  # 向下走楼梯
 
 
 def prepare_clothes_for_wash():
@@ -214,135 +587,43 @@ def prepare_clothes_for_wash():
     Examples:
         prepare_clothes_for_wash()
     """
-    if not check("clothes_sorted"):
-        execute("sort_clothes_by_color_or_material")
+    if not check("clothes_sorted"):  # 检查衣物是否已整理
+        pick_up("clothes")  # 拿起衣物
+        place("clothes", "sorting_area")  # 将衣物放到整理区
+        execute("sort_clothes_by_color_or_material")  # 对衣物进行分类
 
 
-def prepare_washing_machine():
-    """Prepare the washing machine by locating and opening it
+def retrieve_delivery(location: str, target_floor: str):
+    """从指定的楼层接收外卖并放置到目标位置。
+
+    Examples:
+        retrieve_delivery("一楼", "指定交付位置")
+    """
+    # Step 1: 确认外卖是否到达
+    if not check("外卖到达"):
+        print("外卖尚未到达。")
+        return
     
-    Examples:
-        prepare_washing_machine()
-    """
-    if not find("washing_machine"):
-        execute("locate_washing_machine")
+    # Step 2: 如果机器人不在目标楼层，则导航到该楼层
+    if not check(f"机器人在{target_floor}"):
+        go_downstairs(target_floor)  # 导航到目标楼层
 
-    if not check("washing_machine_open"):
-        execute("open_washing_machine")
+    # Step 3: 确保门是打开的
+    if not check("门已打开"):
+        open("门")  # 如果门是关闭的，打开门
 
+    # Step 4: 发现和收集外卖
+    if not find("外卖"):
+        explore(location)  # 在指定位置寻找外卖
+        grab("外卖")  # 拿起外卖
 
-def retrieve_package_from_box(target_floor: str, original_floor: str):
-    """从快递柜中检索包裹，并返回到原来的楼层
-
-    Args:
-        target_floor (str): 快递柜所在楼层（名称或编号）
-        original_floor (str): 返回的原始楼层（名称或编号）
-
-    Examples:
-        retrieve_package_from_box("1F", "3F")
-    """
-    # 确定快递柜所在楼层并前往
-    go_downstairs(target_floor)
-
-    # 在目标楼层寻找快递柜的位置
-    while not find("delivery box"):
-        execute("search_for_delivery_box")
-
-    # 在快递柜前面检测
-    while not check("at_delivery_box"):
-        execute("move_towards_delivery_box")
-
-    # 打开快递柜
-    execute("open_delivery_box")
-
-    # 检测包裹是否在快递柜中
-    if not find("package"):
-        raise Exception("快递不在快递柜中")
-
-    # 从快递柜中取出包裹
-    execute("take_package_from_delivery_box")
-
-    # 返回到原来的楼层
-    go_downstairs(original_floor)
-
-
-def return_to_original_floor(target_floor: str):
-    """返回到初始楼层
-
-    Args:
-        target_floor (str): 返回的目标楼层，例如‘original_floor’
-
-    Examples:
-        return_to_original_floor("original_floor")
-    """
-    execute(f"go_downstairs({target_floor})")
-
-
-def setup_table_and_place_item(item: str, search_table_action: str, place_item_action: str):
-    """找到桌子并摆放
-
-    Examples:
-        setup_table_and_place_item("table", "search_for_table", "place_plate_on_table")
-    """
-    # 找到并摆放桌子
-    if not find(item):
-        execute(search_table_action)
-    execute(place_item_action)
-
-
-def process_clothes():
-    """处理衣服：检索、检查褶皱并叠好后放入衣柜。
-
-    Examples:
-        process_clothes()
-    """
-    # 找到和检索衣服
-    find("clothes")
-    execute("retrieve_clothes")
-
-    # 检查衣服是否有褶皱并进行处理
-    if find("wrinkled_clothes"):
-        while check("clothes_still_wrinkled"):
-            execute("iron_clothes")
-
-    # 叠衣服并放入衣柜
-    execute("fold_clothes")
-    execute("place_clothes_into_wardrobe")
-
-
-def organize_clothes(item_type: str):
-    """对指定类型的衣物进行分类、检查、并执行适当操作以放入衣柜
-
-    Examples:
-        organize_clothes("pants")
-        organize_clothes("shirt")
-    """
-    # 检查是否有衣物需要分类
-    if not find("clothes"):
-        execute("retrieve_clothes")
-
-    # 检查衣物是否有褶皱，并熨平褶皱
-    if find("wrinkled_clothes"):
-        while check("clothes_still_wrinkled"):
-            execute("iron_clothes")
-
-    # 根据衣物类型进行叠衣操作
-    if item_type == "pants":
-        execute("fold_pants")
-    else:
-        execute("fold_shirt")
-
-    # 将叠好的衣物放入衣柜
-    execute("place_clothes_into_wardrobe")
+    # Step 5: 导航到交付位置并放下外卖
+    go_to("指定交付位置")
+    put_down("外卖")  # 放下外卖
 
 def solution():
-    # Stage 1: 分类衣物并放入衣柜
-    # 依据判断选择类型
-    if find("pants"):
-        item_type = "pants"
-    else:
-        item_type = "shirt"
-    organize_clothes(item_type)        
+    # Step 1: 从一楼取外卖并放置到指定交付位置
+    retrieve_delivery("一楼", "1")        
 def main():
     solution()
 

@@ -4,7 +4,7 @@ For (1), from the provided examples about the same task, you job is to generate 
 The functions should have mediocre complexity: (i) containing at least three actions and not too simple (e.g., a single line of code), (ii) not too complex (e.g., more than 10 lines of code), and should be general enough to be applied to other similar tasks. The arguments to these functions should be common variables (such as strings and lists), avoid using complex inputs such as another function.
 
 The actions you can use are:
-'check', 'find', 'execute';
+such as 'check', 'find', 'pick_up', 'put', 'open', etc;
 
 Do not use other undefined actions. Do not include any try-except blocks in the functions.
 

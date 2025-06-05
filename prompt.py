@@ -7,45 +7,31 @@ code_example = """
 
 def solution():
     # Stage 1： 向杯子中加入冰块直到1/3的位置
-    while not check("enough_ice_in_glass"): # 向杯子内加入冰块直到足够
-        execute("fetch_ice_into_glass")
+    while not check("enough_ice_in_glass"):  # 检查杯子内是否有足够的冰块
+        pick_up("ice")  # 拿起冰块
+        place("ice", "glass")  # 将冰块放入杯子中
 
     # Stage 2： 向杯子中加入雪碧直到杯子几乎盛满
-    while not check("glass_is_full"): # 杯子没有满
+    while not check("glass_is_full"):  # 检查杯子是否已满
         try:
-            if check("too_much_foam"): # 如果泡沫太多了就等泡沫消失
+            if check("too_much_foam"):  # 如果泡沫太多，等待泡沫消失
                 wait(1000)
             else:
-                execute("pour_cola_into_glass") # 否则继续倒可乐
+                pour("cola", "glass")  # 倒入雪碧
         except ExcutingError as e:
-            if e == "cola not open"
-                execute("open_the_cola")
+            if e == "cola not open":  # 如果雪碧瓶未打开
+                open("cola")  # 打开雪碧瓶
 
-    # Stage 3：向杯子中放上柠檬片和薄荷
-    if not find("Lemon Slice"): # 切柠檬
-        execute("slice_the_lemon")
+    # Stage 3： 向杯子中放上柠檬片和薄荷
+    if not find("Lemon Slice"):  # 检查柠檬片是否存在
+        slice("lemon")  # 切柠檬
 
-    excute("add_lemon_and_mint") # 加入柠檬片和薄荷
+    put("lemon", "glass")  # 将柠檬片放入杯子
+    put("mint", "glass")  # 将薄荷叶放入杯子中
 
     # Stage 4： 将蓝色的吸管插入杯子中
-    execute("put_straw_into_glass") # 放入吸管
-
-def solution():
-    # Stage 1: 询问葡萄的位置
-    grape_location = input("请输入葡萄所在的位置（例如 'in_refrigerator' 或 'on_kitchen_counter'）：")
-
-    # Stage 2: 找到和检索葡萄
-    find_and_retrieve_item(grape_location, "grapes", "search_for_grapes", "take_grapes")
-
-    # Stage 3: 检查洗手池是否有水槽
-    if not check("sink_has_water"):
-        # 如果没有水槽内没有水，执行打开水槽动作
-        execute("turn_on_sink_water")
-
-    # Stage 4: 清洗葡萄
-    while not check("grapes_are_clean"):
-        # 执行清洗葡萄动作，直到葡萄被清洗干净
-        execute("wash_grapes")
+    grab("straw")  # 拿起吸管
+    place("straw", "glass")  # 将吸管放入杯子
 """
 
 code_sys_prompt = """
@@ -61,7 +47,7 @@ code_sys_prompt = """
 以下是一个示例：
 {code_example}
 
-你只需要回答生成的Python代码，不需要解释或提供额外的上下文。注意:代码中的注释请使用中文。
+你只需要回答生成的Python代码，不需要解释或提供额外的上下文。注意:代码中的注释请使用中文,尽量使用细粒度api而不是execute
 """
 
 
