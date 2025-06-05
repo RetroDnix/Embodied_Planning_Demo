@@ -24,13 +24,13 @@ When we say a division is "complete", we mean that if all subtasks are executed 
 To calc the score, you need to consider the following 2 aspects:
 
 1. [Details]The division which focus on more detailed actions gets 1 score.
-2. [Possibilities]The division which considers more possibilities gets 1 score.
+2. [Reasonableness]The division whose plan is more reasonable.
 
 For each aspect, choose a division(division A or division B) which best follows the description.
 
 The output format is as follows:
 1. [Details] Division _(A/B)
-2. [Possibilities] Division _(A/B)
+2. [Reasonableness] Division _(A/B)
 
 Don't return any other information.
 """
@@ -160,7 +160,7 @@ if __name__ == "__main__":
     print("")
     print("Addtional scores...")
     result = response3.splitlines()
-    aspect = ["Details", "Possibilities"]
+    aspect = ["Details", "Reasonableness"]
     for idx,line in enumerate(result):
         if "Division A" in line:
             scoreA += 1
