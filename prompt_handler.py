@@ -29,6 +29,7 @@ def NL_planning(messages):
             model=GPT_MODEL,
             messages=formatted_messages,
             stream=True,
+            temperature=0.5
         )
     except Exception as e:
         return f"生成回复时出错: {str(e)}"
@@ -63,6 +64,7 @@ def code_planning(messages, task):
         #     num_retrieve = 7
         # )
         formatted_sys_prompt = code_sys_prompt.format(api_tools=api_tools, code_example=code_example)
+        # print(formatted_sys_prompt)
         formatted_messages = [
             {"role": "system", "content": formatted_sys_prompt},
             *messages
@@ -72,6 +74,7 @@ def code_planning(messages, task):
             model=GPT_MODEL,
             messages = formatted_messages,
             stream=True,
+            temperature=0.5
         )
     except Exception as e:
         return f"生成回复时出错: {str(e)}"

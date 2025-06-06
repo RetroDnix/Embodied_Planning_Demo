@@ -1,6 +1,39 @@
 ## Task: 帮我下楼取个外卖
 ### Original solution:
 ```python
+<<<<<<< HEAD
+def make_coffee():
+    # �׶�1����鿧�Ȼ��Ƿ����
+    if not check("coffee_machine_available"):
+        execute("find_coffee_machine")  # ������Ȼ������ã�Ѱ�ҿ��Ȼ�
+        if not check("coffee_machine_available"):
+            return  # �����Ȼ�Ҳ������Ȼ����˳�����
+
+    # �׶�2�����ˮ�Ƿ��㹻
+    if not check("sufficient_water"):
+        execute("add_water")  # ���ˮ����������ˮ
+
+    # �׶�3����鿧�ȶ��Ƿ��㹻
+    if not check("sufficient_coffee_beans"):
+        execute("add_coffee_beans")  # ������ȶ����������ӿ��ȶ�
+
+    # �׶�4����鱭���Ƿ���ú�
+    if not find("coffee_cup"):
+        execute("place_coffee_cup")  # ���û�б��ӣ�����һ������
+
+    # �׶�5����ʼ��������
+    execute("start_coffee_machine")
+
+    # �׶�6���ȴ������������
+    while not check("coffee_ready"):
+        wait(10)  # ÿ��10����һ��
+
+    # �׶�7��ȡ������
+    execute("take_coffee")
+
+# ִ���������ȵ�����
+make_coffee()
+=======
 def solution():
     # Step 1: 确认外卖是否到达
     if not check("外卖到达"):
@@ -61,8 +94,16 @@ def retrieve_delivery(location: str, target_floor: str):
 ```
 
 ## Rewritten Trajectories
+
 ```python
+<<<<<<< HEAD
+def make_coffee():
+    # ִ���������ȵ�����
+    prepare_coffee()
+```
+=======
 def solution():
     # Step 1: 从一楼取外卖并放置到指定交付位置
     retrieve_delivery("一楼", "1")
 ```
+>>>>>>> origin/czguo
