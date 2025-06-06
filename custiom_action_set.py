@@ -46,6 +46,7 @@ class CustomActionSet:
         demo_mode: bool = False,
         retrievable_actions: bool = False,
         use_API: bool = False,
+        print_log = False
     ):
         """
         Initialize with actions from ACTION_DICT or provided ones.
@@ -74,6 +75,7 @@ class CustomActionSet:
         self.action_set: Dict[str, HighLevelAction] = {}
         self.retrievable_action_set: Dict[str, HighLevelAction] = {}
         self.use_API=use_API
+        self.print_log = print_log
 
         self.python_includes += "import time\n"
         for module in [utils, vla, vlm]:
@@ -170,7 +172,7 @@ class CustomActionSet:
         func_str_list: List[str],
         action_name_list: List[str],
         rebuild_index: bool = True,
-        write_action_path: str = "actions/store.py"
+        write_action_path: str = "actions/store.py",
     ) -> None:
         # 写入函数到文件
         try:
@@ -200,9 +202,11 @@ class CustomActionSet:
                     module = getattr(f, '__module__', '')
                     if module.startswith('actions.'):
                         functions.append(f)
-                        print(f"成功获取函数: {name}")
+                        if self.print_log:
+                            print(f"成功获取函数: {name}")
                     else:
-                        print(f"函数'{name}'模块前缀不匹配: {module}")
+                        if self.print_log:
+                            print(f"函数'{name}'模块前缀不匹配: {module}")
             except Exception as e:
                 print(f"获取函数'{name}'失败: {str(e)}")
         
@@ -242,7 +246,7 @@ class CustomActionSet:
         with_long_description: bool = True,
         with_examples: bool = True,
         retrieval_query: Optional[str] = None,
-        num_retrieve: int = 0
+        num_retrieve: int = 0,
     ) -> str:
         """Describe all actions or a subset of actions retrieved by query."""
         action_set = self.action_set
@@ -310,7 +314,7 @@ if __name__ == "__main__":
                 all_function_bodies.extend(function_bodies)
 
             # 打印调试信息
-            for func in all_function_bodies:
+            for func in all_function_bodies and self.print_log:
                 print("="*50)
                 print(func)
                 print("="*50)

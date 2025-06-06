@@ -34,20 +34,21 @@ def NL_planning(messages):
     except Exception as e:
         return f"生成回复时出错: {str(e)}"
 
-def code_planning(messages, task):
+def code_planning(messages, task, temperature=0.5, use_stram=True, print_log=True):
     """
     通过Code进行提示
     """
     try:
         # 基于API进行检索设置
-        custom_actions = CustomActionSet(retrievable_actions=True,use_API=True)
+        custom_actions = CustomActionSet(retrievable_actions=True,use_API=True, print_log=print_log)
         api_tools = custom_actions.describe(
             with_long_description=True,
             with_examples=True,
             retrieval_query = task,
             num_retrieve = 5
         )
-        print(f"api_tools:\n{api_tools}\n{'='*50}")
+        if print_log:
+            print(f"api_tools:\n{api_tools}\n{'='*50}")
         # 无检索设置
         # custom_actions = CustomActionSet(retrievable_actions=False)
         # api_tools = custom_actions.describe(
@@ -73,8 +74,8 @@ def code_planning(messages, task):
         return client.chat.completions.create(
             model=GPT_MODEL,
             messages = formatted_messages,
-            stream=True,
-            temperature=0.5
+            stream=use_stram,
+            temperature=temperature
         )
     except Exception as e:
         return f"生成回复时出错: {str(e)}"

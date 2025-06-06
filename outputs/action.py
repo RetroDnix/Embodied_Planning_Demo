@@ -581,6 +581,50 @@ def go_downstairs(arrived_floor: str) -> None:
         move("downstairs")  # 向下走楼梯
 
 
+def handle_delivery_on_floor(item: str, floor: str, delivery_location: str):
+    """下楼到指定楼层并接收外卖
+
+    Examples:
+        handle_delivery_on_floor("milk_tea", "1st_floor", "指定交付位置")
+    """
+    # Stage 1: 确认是否在目标楼层
+    if not check(f"at_{floor}"):  # 检查是否在指定楼层
+        go_downstairs(floor)  # 下降到目标楼层
+
+    # Stage 2: 接收外卖并放置于指定交付位置
+    retrieve_delivery(floor, delivery_location)  # 从指定楼层接收外卖
+
+    # Stage 3: 检查是否成功接收到物品
+    if find(item):
+        grab(item)  # 拿起物品
+    else:
+        print(f"未找到{item}，请检查交付位置。")  # 记录失败日志
+
+
+def locate_and_retrieve_item(item: str, target_location: str, delivery_area: str):
+    """导航到指定楼层并找到指定物品
+
+    Examples:
+        locate_and_retrieve_item("package", "1st_floor", "delivery_area")
+    """
+    # Stage 1: 确保机器人位于目标楼层
+    if not check("at_target_floor"):
+        go_downstairs(target_location)  # 导航到目标楼层
+
+    # Stage 2: 在交付区域寻找物品
+    if not find(item):
+        explore(delivery_area)  # 探索交付区域以找到物品
+    
+    # Stage 3: 拿起物品，如果找到
+    if find(item):
+        pick_up(item)
+    else:
+        print(f"{item}未找到。")  # 记录失败日志
+    
+    # Stage 4: 将物品放置在指定位置
+    place(item, target_location)  # 将物品放置在目标位置
+
+
 def prepare_clothes_for_wash():
     """Prepare clothes for washing by sorting them
     
@@ -622,30 +666,91 @@ def retrieve_delivery(location: str, target_floor: str):
     put_down("外卖")  # 放下外卖
 
 
-def handle_delivery_on_floor(item: str, floor: str, delivery_location: str):
-    """下楼到指定楼层并接收外卖
+def prepare_clothing_for_trip():
+    """洗净并收拾衣物以便旅行
 
     Examples:
-        handle_delivery_on_floor("milk_tea", "1st_floor", "指定交付位置")
+        prepare_clothing_for_trip()
     """
-    # Stage 1: 确认是否在目标楼层
-    if not check(f"at_{floor}"):  # 检查是否在指定楼层
-        go_downstairs(floor)  # 下降到目标楼层
+    prepare_clothes_for_wash()  # 准备洗涤的衣物
+    while not check("all_clothes_clean"):
+        wash("clothes")  # 洗衣服
+        wait(60)  # 等待洗衣完成
 
-    # Stage 2: 接收外卖并放置于指定交付位置
-    retrieve_delivery(floor, delivery_location)  # 从指定楼层接收外卖
+    while not check("all_clothes_dry"):
+        wait(30)  # 等待衣物晾干
 
-    # Stage 3: 检查是否成功接收到物品
-    if find(item):
-        grab(item)  # 拿起物品
+
+def pack_suitcase(items: list):
+    """将指定物品装进行李箱
+
+    Examples:
+        pack_suitcase(["clothes", "toiletries", "electronics", "snacks"])
+    """
+    for item in items:
+        pick_up(item)  # 拿起物品
+        place(item, "suitcase")  # 将物品放入行李箱
+
+
+def check_destination_weather():
+    """检查旅行目的地的天气状况
+
+    Examples:
+        check_destination_weather()
+    """
+    go_to("computer")
+    switch_on("computer")
+    type("check weather forecast for destination")
+    wait(10)
+    if check("weather_is_good"):
+        print("天气良好，适合旅行")
     else:
-        print(f"未找到{item}，请检查交付位置。")  # 记录失败日志
+        print("天气不佳，可能需要调整计划")
 
-def retrieve_milk_tea():
-    # Stage 1: 下楼并接收奶茶外卖
-    handle_delivery_on_floor("milk_tea", "1st_floor", "指定交付位置")        
+
+def prepare_travel_route():
+    """准备行程路线
+
+    Examples:
+        prepare_travel_route()
+    """
+    go_to("map")
+    examine("map")
+    navigate("north")
+    print("行程路线已准备好")
+
+
+def commence_trip():
+    """开始旅行行程
+
+    Examples:
+        commence_trip()
+    """
+    go_to("door")
+    open("door")
+    walk("outside")
+    print("开始五一旅行")
+
+def travel_plan():
+    # 阶段1：准备衣物
+    prepare_clothing_for_trip()
+
+    # 阶段2：将指定物品装进行李箱
+    pack_suitcase(["clothes", "toiletries", "electronics", "snacks"])
+    
+    # 阶段3：检查目的地天气
+    check_destination_weather()
+
+    # 阶段4：准备行程路线
+    prepare_travel_route()
+
+    # 阶段5：出发旅行
+    commence_trip()
+
+# 执行五一出行计划
+travel_plan()        
 def main():
-    retrieve_milk_tea()
+    travel_plan()
 
 if __name__ == "__main__":
     main()

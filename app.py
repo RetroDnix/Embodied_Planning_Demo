@@ -98,6 +98,8 @@ def generate_responses(prompt, code_placeholder, nl_placeholder):
     
     # 生成代码规划响应
     code_response = ""
+    # import pdb; pdb.set_trace()
+    # print(st.session_state.code_messages, st.session_state.current_session["question"])
     code_generator = code_planning(st.session_state.code_messages, st.session_state.current_session["question"])
     for chunk in process_streaming_response(code_generator):
         code_response += chunk if isinstance(chunk, str) else str(chunk)

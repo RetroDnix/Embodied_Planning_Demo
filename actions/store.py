@@ -70,3 +70,26 @@ def handle_delivery_on_floor(item: str, floor: str, delivery_location: str):
         grab(item)  # 拿起物品
     else:
         print(f"未找到{item}，请检查交付位置。")  # 记录失败日志
+
+def locate_and_retrieve_item(item: str, target_location: str, delivery_area: str):
+    """导航到指定楼层并找到指定物品
+
+    Examples:
+        locate_and_retrieve_item("package", "1st_floor", "delivery_area")
+    """
+    # Stage 1: 确保机器人位于目标楼层
+    if not check("at_target_floor"):
+        go_downstairs(target_location)  # 导航到目标楼层
+
+    # Stage 2: 在交付区域寻找物品
+    if not find(item):
+        explore(delivery_area)  # 探索交付区域以找到物品
+    
+    # Stage 3: 拿起物品，如果找到
+    if find(item):
+        pick_up(item)
+    else:
+        print(f"{item}未找到。")  # 记录失败日志
+    
+    # Stage 4: 将物品放置在指定位置
+    place(item, target_location)  # 将物品放置在目标位置
