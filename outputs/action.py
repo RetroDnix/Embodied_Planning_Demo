@@ -621,11 +621,31 @@ def retrieve_delivery(location: str, target_floor: str):
     go_to("指定交付位置")
     put_down("外卖")  # 放下外卖
 
-def solution():
-    # Step 1: 从一楼取外卖并放置到指定交付位置
-    retrieve_delivery("一楼", "1")        
+
+def handle_delivery_on_floor(item: str, floor: str, delivery_location: str):
+    """下楼到指定楼层并接收外卖
+
+    Examples:
+        handle_delivery_on_floor("milk_tea", "1st_floor", "指定交付位置")
+    """
+    # Stage 1: 确认是否在目标楼层
+    if not check(f"at_{floor}"):  # 检查是否在指定楼层
+        go_downstairs(floor)  # 下降到目标楼层
+
+    # Stage 2: 接收外卖并放置于指定交付位置
+    retrieve_delivery(floor, delivery_location)  # 从指定楼层接收外卖
+
+    # Stage 3: 检查是否成功接收到物品
+    if find(item):
+        grab(item)  # 拿起物品
+    else:
+        print(f"未找到{item}，请检查交付位置。")  # 记录失败日志
+
+def retrieve_milk_tea():
+    # Stage 1: 下楼并接收奶茶外卖
+    handle_delivery_on_floor("milk_tea", "1st_floor", "指定交付位置")        
 def main():
-    solution()
+    retrieve_milk_tea()
 
 if __name__ == "__main__":
     main()

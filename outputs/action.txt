@@ -1,109 +1,50 @@
-## Task: 帮我下楼取个外卖
+## Task: 帮我下楼取个奶茶外卖
 ### Original solution:
 ```python
-<<<<<<< HEAD
-def make_coffee():
-    # �׶�1����鿧�Ȼ��Ƿ����
-    if not check("coffee_machine_available"):
-        execute("find_coffee_machine")  # ������Ȼ������ã�Ѱ�ҿ��Ȼ�
-        if not check("coffee_machine_available"):
-            return  # �����Ȼ�Ҳ������Ȼ����˳�����
+def retrieve_milk_tea():
+    # Stage 1: 检查是否已经在目标楼层
+    if not check("at_1st_floor"):  # 检查是否在一楼
+        go_downstairs("1")  # 下楼到一楼
 
-    # �׶�2�����ˮ�Ƿ��㹻
-    if not check("sufficient_water"):
-        execute("add_water")  # ���ˮ����������ˮ
+    # Stage 2: 从指定位置接收奶茶外卖
+    retrieve_delivery("1st_floor", "指定交付位置")  # 从一楼接收奶茶外卖并放置到目标位置
 
-    # �׶�3����鿧�ȶ��Ƿ��㹻
-    if not check("sufficient_coffee_beans"):
-        execute("add_coffee_beans")  # ������ȶ����������ӿ��ȶ�
+    # Stage 3: 检查是否成功接收到奶茶
+    if find("milk_tea"):  # 检查是否找到奶茶
+        grab("milk_tea")  # 拿起奶茶
+    else:
+        print("未找到奶茶，请检查交付位置。")  # 打印错误信息
 
-    # �׶�4����鱭���Ƿ���ú�
-    if not find("coffee_cup"):
-        execute("place_coffee_cup")  # ���û�б��ӣ�����һ������
-
-    # �׶�5����ʼ��������
-    execute("start_coffee_machine")
-
-    # �׶�6���ȴ������������
-    while not check("coffee_ready"):
-        wait(10)  # ÿ��10����һ��
-
-    # �׶�7��ȡ������
-    execute("take_coffee")
-
-# ִ���������ȵ�����
-make_coffee()
-=======
-def solution():
-    # Step 1: 确认外卖是否到达
-    if not check("外卖到达"):
-        return  # 如果外卖没有到达，任务结束
-
-    # Step 2: 检查机器人当前楼层
-    if not check("机器人在一楼"):
-        go_downstairs("1")  # 如果不在一楼，导航到一楼
-
-    # Step 3: 确认门是否关闭
-    if not check("门已打开"):
-        open("门")  # 如果门是关闭的，打开门
-
-    # Step 4: 找到外卖位置
-    if not find("外卖"):
-        explore("一楼")  # 如果外卖不在视野中，探索一楼以寻找外卖
-
-    # Step 5: 拿起外卖
-    grab("外卖")  # 拿起外卖
-
-    # Step 6: 返回到家中指定位置
-    go_to("指定交付位置")  # 导航到交付位置
-
-    # Step 7: 放下外卖
-    put_down("外卖")  # 将外卖放下
+retrieve_milk_tea()
 ```
 
 
 
 ```python
-def retrieve_delivery(location: str, target_floor: str):
-    """从指定的楼层接收外卖并放置到目标位置。
+def handle_delivery_on_floor(item: str, floor: str, delivery_location: str):
+    """下楼到指定楼层并接收外卖
 
     Examples:
-        retrieve_delivery("一楼", "指定交付位置")
+        handle_delivery_on_floor("milk_tea", "1st_floor", "指定交付位置")
     """
-    # Step 1: 确认外卖是否到达
-    if not check("外卖到达"):
-        print("外卖尚未到达。")
-        return
-    
-    # Step 2: 如果机器人不在目标楼层，则导航到该楼层
-    if not check(f"机器人在{target_floor}"):
-        go_downstairs(target_floor)  # 导航到目标楼层
+    # Stage 1: 确认是否在目标楼层
+    if not check(f"at_{floor}"):  # 检查是否在指定楼层
+        go_downstairs(floor)  # 下降到目标楼层
 
-    # Step 3: 确保门是打开的
-    if not check("门已打开"):
-        open("门")  # 如果门是关闭的，打开门
+    # Stage 2: 接收外卖并放置于指定交付位置
+    retrieve_delivery(floor, delivery_location)  # 从指定楼层接收外卖
 
-    # Step 4: 发现和收集外卖
-    if not find("外卖"):
-        explore(location)  # 在指定位置寻找外卖
-        grab("外卖")  # 拿起外卖
-
-    # Step 5: 导航到交付位置并放下外卖
-    go_to("指定交付位置")
-    put_down("外卖")  # 放下外卖
+    # Stage 3: 检查是否成功接收到物品
+    if find(item):
+        grab(item)  # 拿起物品
+    else:
+        print(f"未找到{item}，请检查交付位置。")  # 记录失败日志
 ```
+
 
 ## Rewritten Trajectories
-
 ```python
-<<<<<<< HEAD
-def make_coffee():
-    # ִ���������ȵ�����
-    prepare_coffee()
+def retrieve_milk_tea():
+    # Stage 1: 下楼并接收奶茶外卖
+    handle_delivery_on_floor("milk_tea", "1st_floor", "指定交付位置")
 ```
-=======
-def solution():
-    # Step 1: 从一楼取外卖并放置到指定交付位置
-    retrieve_delivery("一楼", "1")
-```
->>>>>>> origin/czguo

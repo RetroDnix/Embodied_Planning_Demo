@@ -51,3 +51,22 @@ def retrieve_delivery(location: str, target_floor: str):
     # Step 5: 导航到交付位置并放下外卖
     go_to("指定交付位置")
     put_down("外卖")  # 放下外卖
+
+def handle_delivery_on_floor(item: str, floor: str, delivery_location: str):
+    """下楼到指定楼层并接收外卖
+
+    Examples:
+        handle_delivery_on_floor("milk_tea", "1st_floor", "指定交付位置")
+    """
+    # Stage 1: 确认是否在目标楼层
+    if not check(f"at_{floor}"):  # 检查是否在指定楼层
+        go_downstairs(floor)  # 下降到目标楼层
+
+    # Stage 2: 接收外卖并放置于指定交付位置
+    retrieve_delivery(floor, delivery_location)  # 从指定楼层接收外卖
+
+    # Stage 3: 检查是否成功接收到物品
+    if find(item):
+        grab(item)  # 拿起物品
+    else:
+        print(f"未找到{item}，请检查交付位置。")  # 记录失败日志
