@@ -1,8 +1,9 @@
 import streamlit as st
 from datetime import datetime
-from prompt_handler import NL_planning, code_planning
+from prompt_handler import NL_planning, code_planning, extract_action_sequence, get_score, extract_action_sequence_nl
 from induce.induce_actions import induce
 from custiom_action_set import CustomActionSet
+from evaluate_prompt import build_evaluation_prompt
 
 # 配置页面
 st.set_page_config(
@@ -98,8 +99,6 @@ def generate_responses(prompt, code_placeholder, nl_placeholder):
     
     # 生成代码规划响应
     code_response = ""
-    # import pdb; pdb.set_trace()
-    # print(st.session_state.code_messages, st.session_state.current_session["question"])
     code_generator = code_planning(st.session_state.code_messages, st.session_state.current_session["question"])
     for chunk in process_streaming_response(code_generator):
         code_response += chunk if isinstance(chunk, str) else str(chunk)
@@ -123,6 +122,18 @@ def generate_responses(prompt, code_placeholder, nl_placeholder):
                     st.divider()
             # 显示原始代码响应
             st.markdown(code_response)
+    
+    # 提取动作序列
+    action_sequence = extract_action_sequence(code_response)
+    print(action_sequence)
+    if action_sequence:
+        # 构建评估提示并输出评分
+        evaluation_prompt = build_evaluation_prompt(prompt, action_sequence)
+        print("\n=== 代码动作序列评估 ===")
+        print(f"任务指令: {prompt}")
+        print("\n评估结果:")
+        print(get_score(evaluation_prompt))
+    
     code_assistant_message = {"role": "assistant", "content": code_response}
     st.session_state.code_messages.append(code_assistant_message)
     # 生成NL规划响应
@@ -135,6 +146,13 @@ def generate_responses(prompt, code_placeholder, nl_placeholder):
     # 添加NL响应到NL消息历史
     nl_assistant_message = {"role": "assistant", "content": nl_response}
     st.session_state.nl_messages.append(nl_assistant_message)
+    action_sequence_nl = extract_action_sequence_nl(nl_response)
+    if action_sequence_nl:
+        evaluation_prompt_nl = build_evaluation_prompt(prompt, action_sequence_nl)
+        print("\n=== 自然语言动作序列评估 ===")
+        print(f"任务指令: {prompt}") 
+        print("\n评估结果:")
+        print(get_score(evaluation_prompt_nl))
     return code_response, nl_response
 
 # 主页面布局
