@@ -666,91 +666,76 @@ def retrieve_delivery(location: str, target_floor: str):
     put_down("外卖")  # 放下外卖
 
 
-def prepare_clothing_for_trip():
-    """洗净并收拾衣物以便旅行
+def ensure_package_arrival():
+    """确保快递已到达，如果未到达则等待"""
+    if not check("package_arrived"):
+        wait_for_package()  # 等待快递到达
+
+
+def determine_package_location():
+    """确定快递的位置并返回位置标识符
 
     Examples:
-        prepare_clothing_for_trip()
+        location = determine_package_location()
     """
-    prepare_clothes_for_wash()  # 准备洗涤的衣物
-    while not check("all_clothes_clean"):
-        wash("clothes")  # 洗衣服
-        wait(60)  # 等待洗衣完成
-
-    while not check("all_clothes_dry"):
-        wait(30)  # 等待衣物晾干
-
-
-def pack_suitcase(items: list):
-    """将指定物品装进行李箱
-
-    Examples:
-        pack_suitcase(["clothes", "toiletries", "electronics", "snacks"])
-    """
-    for item in items:
-        pick_up(item)  # 拿起物品
-        place(item, "suitcase")  # 将物品放入行李箱
-
-
-def check_destination_weather():
-    """检查旅行目的地的天气状况
-
-    Examples:
-        check_destination_weather()
-    """
-    go_to("computer")
-    switch_on("computer")
-    type("check weather forecast for destination")
-    wait(10)
-    if check("weather_is_good"):
-        print("天气良好，适合旅行")
+    if find("package_area"):
+        return "package_area"
     else:
-        print("天气不佳，可能需要调整计划")
+        explore("floor")
+        return "found_package_area"
 
 
-def prepare_travel_route():
-    """准备行程路线
-
-    Examples:
-        prepare_travel_route()
-    """
-    go_to("map")
-    examine("map")
-    navigate("north")
-    print("行程路线已准备好")
-
-
-def commence_trip():
-    """开始旅行行程
-
-    Examples:
-        commence_trip()
-    """
-    go_to("door")
-    open("door")
-    walk("outside")
-    print("开始五一旅行")
-
-def travel_plan():
-    # 阶段1：准备衣物
-    prepare_clothing_for_trip()
-
-    # 阶段2：将指定物品装进行李箱
-    pack_suitcase(["clothes", "toiletries", "electronics", "snacks"])
+def retrieve_item_from_location(item: str, location: str, floor: str):
+    """在指定的位置接收物品
     
-    # 阶段3：检查目的地天气
-    check_destination_weather()
+    Examples:
+        retrieve_item_from_location("package", "1st_floor", "package_area")
+    """
+    go_downstairs(floor)  # 到达指定楼层
+    locate_and_retrieve_item(item, floor, location)  # 在指定位置接收物品
 
-    # 阶段4：准备行程路线
-    prepare_travel_route()
 
-    # 阶段5：出发旅行
-    commence_trip()
+def ensure_resource_availability(resource: str, check_interval: int = 300):
+    """在资源可用之前，持续检查。
 
-# 执行五一出行计划
-travel_plan()        
+    Examples:
+        ensure_resource_availability("package_arrived", 300)
+    """
+    while not check(resource):  # 检查资源是否可用
+        wait(check_interval)  # 如果不可用，等待指定的时间间隔
+
+def find_resource_location(resource: str, area: str):
+    """寻找资源的位置并返回位置标识符。
+
+    Examples:
+        location = find_resource_location("package", "floor")
+    """
+    if find(resource):  # 检查是否能找到资源区域
+        return f"{resource}_area"
+    else:
+        explore(area)  # 探索指定区域以找到资源
+        return f"found_{resource}_area"
+
+def retrieve_item(item: str, area: str, location: str):
+    """从指定位置检索物品
+
+    Examples:
+        retrieve_item("package", "1st_floor", "package_area")
+    """
+    # 在指定的位置接收物品
+    retrieve_item_from_location(item, area, location)
+
+def retrieve_package():
+    # 阶段1：确保快递已到达
+    ensure_resource_availability("package_arrived", 300)
+
+    # 阶段2：确定快递的位置
+    package_location = find_resource_location("package", "floor")
+
+    # 阶段3：下楼到指定楼层并找到快递
+    retrieve_item("package", "1st_floor", package_location)        
 def main():
-    travel_plan()
+    retrieve_package()
 
 if __name__ == "__main__":
     main()

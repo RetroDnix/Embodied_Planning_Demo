@@ -24,72 +24,32 @@ def prepare_clothes_for_wash():
         place("clothes", "sorting_area")  # 将衣物放到整理区
         execute("sort_clothes_by_color_or_material")  # 对衣物进行分类
 
-def retrieve_delivery(location: str, target_floor: str):
-    """从指定的楼层接收外卖并放置到目标位置。
+def ensure_resource_availability(resource: str, check_interval: int = 300):
+    """在资源可用之前，持续检查。
 
     Examples:
-        retrieve_delivery("一楼", "指定交付位置")
+        ensure_resource_availability("package_arrived", 300)
     """
-    # Step 1: 确认外卖是否到达
-    if not check("外卖到达"):
-        print("外卖尚未到达。")
-        return
-    
-    # Step 2: 如果机器人不在目标楼层，则导航到该楼层
-    if not check(f"机器人在{target_floor}"):
-        go_downstairs(target_floor)  # 导航到目标楼层
+    while not check(resource):  # 检查资源是否可用
+        wait(check_interval)  # 如果不可用，等待指定的时间间隔
 
-    # Step 3: 确保门是打开的
-    if not check("门已打开"):
-        open("门")  # 如果门是关闭的，打开门
-
-    # Step 4: 发现和收集外卖
-    if not find("外卖"):
-        explore(location)  # 在指定位置寻找外卖
-        grab("外卖")  # 拿起外卖
-
-    # Step 5: 导航到交付位置并放下外卖
-    go_to("指定交付位置")
-    put_down("外卖")  # 放下外卖
-
-def handle_delivery_on_floor(item: str, floor: str, delivery_location: str):
-    """下楼到指定楼层并接收外卖
+def find_resource_location(resource: str, area: str):
+    """寻找资源的位置并返回位置标识符。
 
     Examples:
-        handle_delivery_on_floor("milk_tea", "1st_floor", "指定交付位置")
+        location = find_resource_location("package", "floor")
     """
-    # Stage 1: 确认是否在目标楼层
-    if not check(f"at_{floor}"):  # 检查是否在指定楼层
-        go_downstairs(floor)  # 下降到目标楼层
-
-    # Stage 2: 接收外卖并放置于指定交付位置
-    retrieve_delivery(floor, delivery_location)  # 从指定楼层接收外卖
-
-    # Stage 3: 检查是否成功接收到物品
-    if find(item):
-        grab(item)  # 拿起物品
+    if find(resource):  # 检查是否能找到资源区域
+        return f"{resource}_area"
     else:
-        print(f"未找到{item}，请检查交付位置。")  # 记录失败日志
+        explore(area)  # 探索指定区域以找到资源
+        return f"found_{resource}_area"
 
-def locate_and_retrieve_item(item: str, target_location: str, delivery_area: str):
-    """导航到指定楼层并找到指定物品
+def retrieve_item(item: str, area: str, location: str):
+    """从指定位置检索物品
 
     Examples:
-        locate_and_retrieve_item("package", "1st_floor", "delivery_area")
+        retrieve_item("package", "1st_floor", "package_area")
     """
-    # Stage 1: 确保机器人位于目标楼层
-    if not check("at_target_floor"):
-        go_downstairs(target_location)  # 导航到目标楼层
-
-    # Stage 2: 在交付区域寻找物品
-    if not find(item):
-        explore(delivery_area)  # 探索交付区域以找到物品
-    
-    # Stage 3: 拿起物品，如果找到
-    if find(item):
-        pick_up(item)
-    else:
-        print(f"{item}未找到。")  # 记录失败日志
-    
-    # Stage 4: 将物品放置在指定位置
-    place(item, target_location)  # 将物品放置在目标位置
+    # 在指定的位置接收物品
+    retrieve_item_from_location(item, area, location)

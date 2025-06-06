@@ -12,3 +12,6 @@ pip install -r requirements.txt
 streamlit run app.py
 streamlit run app.py --server.runOnSave false --server.fileWatcherType none
 ```
+
+# interface.py: API函数接口
+# eval/*: 评估脚本，包括完备性和相关性的评估
