@@ -19,7 +19,7 @@ class CodePlanner:
             self.history.append(
                 {
                     "role": "assistant",
-                    "content": response
+                    "content": response.choices[0].message.content
                 }
             )
             return response.choices[0].message.content
