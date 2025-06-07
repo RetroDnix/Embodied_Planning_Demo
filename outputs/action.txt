@@ -1,76 +1,129 @@
-## Task: 怎么取快递
+## Task: 制定一个五一出行规划
 ### Original solution:
 ```python
-def retrieve_package():
-    # 阶段1：确保快递已到达
-    ensure_package_arrival()  # 确保快递已到达，如果未到达则等待
+def travel_plan():
+    # Stage 1：准备行李
+    prepare_clothes_for_wash()  # 准备洗衣服
+    while not check("clothes_cleaned"):  # 检查衣服是否洗净
+        wash("clothes")  # 洗衣服
+    
+    while not check("clothes_dried"):  # 检查衣服是否干燥
+        wait(600)  # 等待衣服干燥
 
-    # 阶段2：确定快递的位置
-    package_location = determine_package_location()  # 确定快递的位置并返回位置标识符
+    pack_items()  # 打包行李
 
-    # 阶段3：下楼到指定楼层并找到快递
-    retrieve_item_from_location("package", "1st_floor", package_location)  # 在指定的位置接收快递
+    # Stage 2：检查交通工具
+    if not check("car_fueled"):  # 检查汽车是否加满油
+        go_to("gas_station")  # 前往加油站
+        fill("car", "fuel")  # 加满油
 
-def ensure_package_arrival():
-    # 确保快递已到达
-    while not check("package_arrived"):  # 检查快递是否到达
-        wait(300)  # 如果未到达，等待5分钟
+    if not check("car_checked"):  # 检查汽车是否经过检查
+        perform_car_check()  # 进行汽车检查
 
-def determine_package_location():
-    # 确定快递的位置
-    if find("package_area"):  # 检查是否能找到快递区域
-        return "package_area"
-    else:
-        explore("floor")  # 探索楼层以找到快递区域
-        return "found_package_area"
+    # Stage 3：规划行程路线
+    if not check("route_planned"):  # 检查路线是否已规划
+        plan_route(destination="beach")  # 规划前往海滩的路线
+
+    # Stage 4：出发前的最后准备
+    ensure_resource_availability("weather_good", 600)  # 确保天气良好
+    ensure_resource_availability("traffic_clear", 600)  # 确保交通顺畅
+
+    # Stage 5：出发
+    go_to("beach")  # 前往海滩
+
+def pack_items():
+    # 打包行李物品
+    grab("clothes")  # 拿起衣服
+    put("clothes", "suitcase")  # 放入行李箱
+
+    grab("toiletries")  # 拿起洗漱用品
+    put("toiletries", "suitcase")  # 放入行李箱
+
+    grab("snacks")  # 拿起零食
+    put("snacks", "bag")  # 放入包中
+
+def perform_car_check():
+    # 进行汽车检查
+    examine("car_tires")  # 检查轮胎
+    examine("car_engine")  # 检查发动机
+    examine("car_brakes")  # 检查刹车
+
+def plan_route(destination: str):
+    # 规划路线
+    find_resource_location("map", "home")  # 找到地图位置
+    navigate("north")  # 导航到北方
+    navigate("east")  # 导航到东方
 ```
 
-此代码提供了一个取快递的计划，包括确保快递已到达、确定快递位置、下楼到指定楼层以及在指定位置接收快递的各个阶段。请根据具体情况调整细节。
 
 
 
 ```python
-def ensure_resource_availability(resource: str, check_interval: int = 300):
-    """在资源可用之前，持续检查。
+def prepare_clothes_for_trip():
+    """准备衣物并打包它们以便出行。
 
     Examples:
-        ensure_resource_availability("package_arrived", 300)
+        prepare_clothes_for_trip()
     """
-    while not check(resource):  # 检查资源是否可用
-        wait(check_interval)  # 如果不可用，等待指定的时间间隔
+    # Stage 1: 准备洗衣服
+    prepare_clothes_for_wash()
 
-def find_resource_location(resource: str, area: str):
-    """寻找资源的位置并返回位置标识符。
+    # Stage 2: 确保衣物已清洁
+    while not check("clothes_cleaned"):
+        wash("clothes")
+    
+    # Stage 3: 确保衣物已干燥
+    while not check("clothes_dried"):
+        wait(600)
+
+    # Stage 4: 打包清洁衣物
+    pack_items()
+
+
+def ensure_car_ready_for_trip():
+    """确保车辆已加满油并经过全面检查。
 
     Examples:
-        location = find_resource_location("package", "floor")
+        ensure_car_ready_for_trip()
     """
-    if find(resource):  # 检查是否能找到资源区域
-        return f"{resource}_area"
-    else:
-        explore(area)  # 探索指定区域以找到资源
-        return f"found_{resource}_area"
+    # Stage 1: 检查并加满油
+    if not check("car_fueled"):
+        go_to("gas_station")
+        fill("car", "fuel")
+    
+    # Stage 2: 检查车辆状况
+    if not check("car_checked"):
+        perform_car_check()
 
-def retrieve_item(item: str, area: str, location: str):
-    """从指定位置检索物品
+
+def confirm_conditions_and_depart(destination: str):
+    """确认出行条件并出发。
 
     Examples:
-        retrieve_item("package", "1st_floor", "package_area")
+        confirm_conditions_and_depart("beach")
     """
-    # 在指定的位置接收物品
-    retrieve_item_from_location(item, area, location)
+    # Stage 1: 规划行程路线
+    if not check("route_planned"):
+        plan_route(destination)
+    
+    # Stage 2: 确保资源可用性
+    ensure_resource_availability("weather_good", 600)
+    ensure_resource_availability("traffic_clear", 600)
+    
+    # Stage 3: 出发
+    go_to(destination)
+
 ```
-
 
 ## Rewritten Trajectories
 ```python
-def retrieve_package():
-    # 阶段1：确保快递已到达
-    ensure_resource_availability("package_arrived", 300)
+def travel_plan():
+    # Stage 1: 准备清洁衣物并打包
+    prepare_clothes_for_trip()
+    
+    # Stage 2: 确保车辆已准备好出行
+    ensure_car_ready_for_trip()
 
-    # 阶段2：确定快递的位置
-    package_location = find_resource_location("package", "floor")
-
-    # 阶段3：下楼到指定楼层并找到快递
-    retrieve_item("package", "1st_floor", package_location)
+    # Stage 3: 确认条件并出发到目的地
+    confirm_conditions_and_depart("beach")
 ```

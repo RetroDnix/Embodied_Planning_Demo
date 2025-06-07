@@ -570,6 +570,29 @@ def wipe(object: str) -> None:
     vla(f"wipe {object}")
 
 
+def ensure_resource_availability(resource: str, check_interval: int = 300):
+    """在资源可用之前，持续检查。
+
+    Examples:
+        ensure_resource_availability("package_arrived", 300)
+    """
+    while not check(resource):  # 检查资源是否可用
+        wait(check_interval)  # 如果不可用，等待指定的时间间隔
+
+
+def find_resource_location(resource: str, area: str):
+    """寻找资源的位置并返回位置标识符。
+
+    Examples:
+        location = find_resource_location("package", "floor")
+    """
+    if find(resource):  # 检查是否能找到资源区域
+        return f"{resource}_area"
+    else:
+        explore(area)  # 探索指定区域以找到资源
+        return f"found_{resource}_area"
+
+
 def go_downstairs(arrived_floor: str) -> None:
     """Navigate robot to specified floor
 
@@ -579,50 +602,6 @@ def go_downstairs(arrived_floor: str) -> None:
     """
     while not check("at_" + arrived_floor + "_floor"):  # 检查是否在指定楼层
         move("downstairs")  # 向下走楼梯
-
-
-def handle_delivery_on_floor(item: str, floor: str, delivery_location: str):
-    """下楼到指定楼层并接收外卖
-
-    Examples:
-        handle_delivery_on_floor("milk_tea", "1st_floor", "指定交付位置")
-    """
-    # Stage 1: 确认是否在目标楼层
-    if not check(f"at_{floor}"):  # 检查是否在指定楼层
-        go_downstairs(floor)  # 下降到目标楼层
-
-    # Stage 2: 接收外卖并放置于指定交付位置
-    retrieve_delivery(floor, delivery_location)  # 从指定楼层接收外卖
-
-    # Stage 3: 检查是否成功接收到物品
-    if find(item):
-        grab(item)  # 拿起物品
-    else:
-        print(f"未找到{item}，请检查交付位置。")  # 记录失败日志
-
-
-def locate_and_retrieve_item(item: str, target_location: str, delivery_area: str):
-    """导航到指定楼层并找到指定物品
-
-    Examples:
-        locate_and_retrieve_item("package", "1st_floor", "delivery_area")
-    """
-    # Stage 1: 确保机器人位于目标楼层
-    if not check("at_target_floor"):
-        go_downstairs(target_location)  # 导航到目标楼层
-
-    # Stage 2: 在交付区域寻找物品
-    if not find(item):
-        explore(delivery_area)  # 探索交付区域以找到物品
-    
-    # Stage 3: 拿起物品，如果找到
-    if find(item):
-        pick_up(item)
-    else:
-        print(f"{item}未找到。")  # 记录失败日志
-    
-    # Stage 4: 将物品放置在指定位置
-    place(item, target_location)  # 将物品放置在目标位置
 
 
 def prepare_clothes_for_wash():
@@ -637,85 +616,6 @@ def prepare_clothes_for_wash():
         execute("sort_clothes_by_color_or_material")  # 对衣物进行分类
 
 
-def retrieve_delivery(location: str, target_floor: str):
-    """从指定的楼层接收外卖并放置到目标位置。
-
-    Examples:
-        retrieve_delivery("一楼", "指定交付位置")
-    """
-    # Step 1: 确认外卖是否到达
-    if not check("外卖到达"):
-        print("外卖尚未到达。")
-        return
-    
-    # Step 2: 如果机器人不在目标楼层，则导航到该楼层
-    if not check(f"机器人在{target_floor}"):
-        go_downstairs(target_floor)  # 导航到目标楼层
-
-    # Step 3: 确保门是打开的
-    if not check("门已打开"):
-        open("门")  # 如果门是关闭的，打开门
-
-    # Step 4: 发现和收集外卖
-    if not find("外卖"):
-        explore(location)  # 在指定位置寻找外卖
-        grab("外卖")  # 拿起外卖
-
-    # Step 5: 导航到交付位置并放下外卖
-    go_to("指定交付位置")
-    put_down("外卖")  # 放下外卖
-
-
-def ensure_package_arrival():
-    """确保快递已到达，如果未到达则等待"""
-    if not check("package_arrived"):
-        wait_for_package()  # 等待快递到达
-
-
-def determine_package_location():
-    """确定快递的位置并返回位置标识符
-
-    Examples:
-        location = determine_package_location()
-    """
-    if find("package_area"):
-        return "package_area"
-    else:
-        explore("floor")
-        return "found_package_area"
-
-
-def retrieve_item_from_location(item: str, location: str, floor: str):
-    """在指定的位置接收物品
-    
-    Examples:
-        retrieve_item_from_location("package", "1st_floor", "package_area")
-    """
-    go_downstairs(floor)  # 到达指定楼层
-    locate_and_retrieve_item(item, floor, location)  # 在指定位置接收物品
-
-
-def ensure_resource_availability(resource: str, check_interval: int = 300):
-    """在资源可用之前，持续检查。
-
-    Examples:
-        ensure_resource_availability("package_arrived", 300)
-    """
-    while not check(resource):  # 检查资源是否可用
-        wait(check_interval)  # 如果不可用，等待指定的时间间隔
-
-def find_resource_location(resource: str, area: str):
-    """寻找资源的位置并返回位置标识符。
-
-    Examples:
-        location = find_resource_location("package", "floor")
-    """
-    if find(resource):  # 检查是否能找到资源区域
-        return f"{resource}_area"
-    else:
-        explore(area)  # 探索指定区域以找到资源
-        return f"found_{resource}_area"
-
 def retrieve_item(item: str, area: str, location: str):
     """从指定位置检索物品
 
@@ -725,17 +625,72 @@ def retrieve_item(item: str, area: str, location: str):
     # 在指定的位置接收物品
     retrieve_item_from_location(item, area, location)
 
-def retrieve_package():
-    # 阶段1：确保快递已到达
-    ensure_resource_availability("package_arrived", 300)
 
-    # 阶段2：确定快递的位置
-    package_location = find_resource_location("package", "floor")
+def prepare_clothes_for_trip():
+    """准备衣物并打包它们以便出行。
 
-    # 阶段3：下楼到指定楼层并找到快递
-    retrieve_item("package", "1st_floor", package_location)        
+    Examples:
+        prepare_clothes_for_trip()
+    """
+    # Stage 1: 准备洗衣服
+    prepare_clothes_for_wash()
+
+    # Stage 2: 确保衣物已清洁
+    while not check("clothes_cleaned"):
+        wash("clothes")
+    
+    # Stage 3: 确保衣物已干燥
+    while not check("clothes_dried"):
+        wait(600)
+
+    # Stage 4: 打包清洁衣物
+    pack_items()
+
+
+def ensure_car_ready_for_trip():
+    """确保车辆已加满油并经过全面检查。
+
+    Examples:
+        ensure_car_ready_for_trip()
+    """
+    # Stage 1: 检查并加满油
+    if not check("car_fueled"):
+        go_to("gas_station")
+        fill("car", "fuel")
+    
+    # Stage 2: 检查车辆状况
+    if not check("car_checked"):
+        perform_car_check()
+
+
+def confirm_conditions_and_depart(destination: str):
+    """确认出行条件并出发。
+
+    Examples:
+        confirm_conditions_and_depart("beach")
+    """
+    # Stage 1: 规划行程路线
+    if not check("route_planned"):
+        plan_route(destination)
+    
+    # Stage 2: 确保资源可用性
+    ensure_resource_availability("weather_good", 600)
+    ensure_resource_availability("traffic_clear", 600)
+    
+    # Stage 3: 出发
+    go_to(destination)
+
+def travel_plan():
+    # Stage 1: 准备清洁衣物并打包
+    prepare_clothes_for_trip()
+    
+    # Stage 2: 确保车辆已准备好出行
+    ensure_car_ready_for_trip()
+
+    # Stage 3: 确认条件并出发到目的地
+    confirm_conditions_and_depart("beach")        
 def main():
-    retrieve_package()
+    travel_plan()
 
 if __name__ == "__main__":
     main()
