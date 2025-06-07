@@ -1,11 +1,3 @@
-from base.vla import vla
-from base.vlm import vlm_check, vlm_find
-from base.utils import wait
-
-# --------------------------------------------------
-# Base Robot API
-# --------------------------------------------------
-
 def execute(command: str) -> None:
     """Execute primitive robot action other than those defined
     

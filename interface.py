@@ -15,7 +15,8 @@ class CodePlanner:
                     "content": prompt
                 }
             )
-            response = code_planning(self.history, prompt, use_stream=use_stream, print_log=False)
+            response = code_planning(self.history, prompt, use_stream=use_stream)
+            # print(response)
             self.history.append(
                 {
                     "role": "assistant",

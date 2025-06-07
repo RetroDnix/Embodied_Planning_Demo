@@ -1,17 +1,12 @@
-# NL与Code的具身规划能力对比
 
-## Install
-
-```bash
-pip install -r requirements.txt
+# 使用API接口:
+```
+from interface import CodePlanner
+planner = CodePlanner()
+task_info = {
+    "task":"制定一个五一出行规划",
+    "sub_task":["寻找电梯", "进入电梯"]
+}
+print(planner.chat(task_info))
 ```
 
-## Run
-
-```bash
-streamlit run app.py
-streamlit run app.py --server.runOnSave false --server.fileWatcherType none
-```
-
-# interface.py: API函数接口
-# eval/*: 评估脚本，包括完备性和相关性的评估
